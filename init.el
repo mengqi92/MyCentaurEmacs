@@ -115,6 +115,7 @@ Otherwise the startup will be very slow. "
 (require 'init-ivy)
 (require 'init-company)
 (require 'init-yasnippet)
+(require 'init-chinese)
 
 (require 'init-bookmark)
 (require 'init-calendar)
