@@ -29,6 +29,7 @@
 ;; (setq desktop-base-file-name (format ".emacs-%s.desktop" emacs-major-version))
 ;; (setq desktop-base-lock-name (format ".emacs-%s.desktop.lock" emacs-major-version))
 
+
 ;; Fonts
 (defun centaur-setup-fonts ()
   "Setup fonts."
@@ -74,9 +75,14 @@
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
 (add-hook 'server-after-make-frame-hook #'centaur-setup-fonts)
 
-;; Evil mode
-;; (use-package 'evil
-;; :config (evil-mode 1))
+;;设置窗口位置为屏幕左上角(0,0)
+(set-frame-position (selected-frame) 0 0)
+
+(set-frame-width (selected-frame) 110)
+(set-frame-height (selected-frame) 33)
+
+;; 设置选择区域快捷键
+(global-set-key (kbd "C-.") 'set-mark-command)
 
 ;; Mail
 ;; (setq message-send-mail-function 'smtpmail-send-it
@@ -92,9 +98,6 @@
 ;; (setq calendar-location-name "Chengdu"
 ;;       calendar-latitude 30.67
 ;;       calendar-longitude 104.07)
-
-;; (package-)
-
 
 ;; Misc.
 ;; (setq confirm-kill-emacs 'y-or-n-p)
