@@ -335,7 +335,7 @@ prepended to the element after the #+HEADER: tag."
     (setq org-roam-dailies-capture-templates
           `(("d" "daily" plain "* %?"
              :target (file+head "%<%Y %m %d>.org" "#+title: %<%Y-%m-%d>\n")
-             :unarrowed t))
+             :unarrowed t)))
 
 
     (when emacs/>=27p
