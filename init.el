@@ -136,7 +136,6 @@ Otherwise the startup will be very slow. "
 
 (require 'init-dict)
 (require 'init-docker)
-(require 'init-player)
 (require 'init-utils)
 
 ;; Programming
@@ -148,13 +147,8 @@ Otherwise the startup will be very slow. "
 
 (require 'init-prog)
 (require 'init-elisp)
-(require 'init-c)
-(require 'init-go)
-(require 'init-rust)
 (require 'init-python)
-(require 'init-ruby)
 (require 'init-dart)
-(require 'init-elixir)
 (require 'init-web)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
