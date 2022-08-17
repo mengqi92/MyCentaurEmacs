@@ -331,6 +331,13 @@ prepended to the element after the #+HEADER: tag."
     (unless (file-exists-p org-roam-directory)
       (make-directory org-roam-directory))
 
+
+    (setq org-roam-dailies-capture-templates
+          `(("d" "daily" plain "* %?"
+             :target (file+head "%<%Y %m %d>.org" "#+title: %<%Y-%m-%d>\n")
+             :unarrowed t))
+
+
     (when emacs/>=27p
       (use-package org-roam-ui
         :init
