@@ -205,6 +205,9 @@ prepended to the element after the #+HEADER: tag."
                         '("🅐" "🅑" "🅒" "🅓")
                       '("HIGH" "MEDIUM" "LOW" "OPTIONAL"))))))
 
+  (use-package valign
+    :hook (org-mode . valign-mode))
+
   ;; Babel
   (setq org-confirm-babel-evaluate nil
         org-src-fontify-natively t
