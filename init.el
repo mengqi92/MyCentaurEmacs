@@ -111,6 +111,7 @@ Otherwise the startup will be very slow. "
 (require 'init-hydra)
 
 (require 'init-ui)
+(require 'init-evil)
 (require 'init-edit)
 (require 'init-ivy)
 (require 'init-company)
