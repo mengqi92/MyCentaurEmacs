@@ -15,7 +15,7 @@
   (define-key cnfonts-mode-map (kbd "C--") #'cnfonts-decrease-fontsize)
   (define-key cnfonts-mode-map (kbd "C-=") #'cnfonts-increase-fontsize)
 
-  (setq cnfonts-personal-fontnames '(("Bookerly") ("LXGW Wenkai")))
+  (setq cnfonts-personal-fontnames '(("Bookerly") ("LXGW Wenkai") nil ("Fira Code Symbol")))
 
   (setq cnfonts-profiles
         '("Reading" "Org Mode" "Programming"))
@@ -25,4 +25,3 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; init-chinese.el ends here
-

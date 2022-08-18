@@ -337,7 +337,8 @@
 (use-package display-line-numbers
   :ensure nil
   :hook ((prog-mode yaml-mode conf-mode) . display-line-numbers-mode)
-  :init (setq display-line-numbers-width-start t))
+  :init (setq display-line-numbers-width-start t)
+  :config (setq display-line-numbers 'relative))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil

@@ -21,7 +21,7 @@
 ;; (setq centaur-tree-sitter t)                   ; Enable `tree-sitter' or not: t or nil
 ;; (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 ;; (setq centaur-player t)                        ; Enable players or not: t or nil
-;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
+(setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
 ;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
 
 ;; For Emacs devel
@@ -35,7 +35,7 @@
   "Setup fonts."
   (when (display-graphic-p)
     ;; Set default font
-    (cl-loop for font in '("Bookerly" "Cascadia Code" "Fira Code" "Jetbrains Mono"
+    (cl-loop for font in '("Fira Code" "Bookerly" "Cascadia Code" "Jetbrains Mono"
                            "SF Mono" "Hack" "Source Code Pro" "Menlo"
                            "Monaco" "DejaVu Sans Mono" "Consolas")
              when (font-installed-p font)
