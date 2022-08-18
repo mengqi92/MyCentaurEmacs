@@ -7,12 +7,13 @@
 
 ;;; Code:
 
+(setq evil-want-keybinding nil)
 (use-package evil
   :config
   (evil-mode 1))
 
-(use-package evil-collection)
-
+(use-package evil-collection
+  :init (evil-collection-init))
 
 (provide 'init-evil)
 
