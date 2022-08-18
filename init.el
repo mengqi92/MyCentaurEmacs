@@ -138,6 +138,7 @@ Otherwise the startup will be very slow. "
 (require 'init-dict)
 (require 'init-docker)
 (require 'init-utils)
+(require 'init-finance)
 
 ;; Programming
 (require 'init-vcs)
