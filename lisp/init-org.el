@@ -138,9 +138,9 @@ prepended to the element after the #+HEADER: tag."
 	       "* Topic: %^{Description}  %^g %? Added: %U"))
 
         org-todo-keywords
-        '((sequence "TODO(t)" "DOING(i)" "HANGUP(h)" "|" "DONE(d)" "CANCELED(c)")
+        '((sequence "TODO(t)" "DOING(i)" "HOLD(h)" "|" "DONE(d)" "CANCELED(c)")
           (sequence "⚑(T)" "🏴(I)" "❓(H)" "|" "✔(D)" "✘(C)"))
-        org-todo-keyword-faces '(("HANGUP" . warning)
+        org-todo-keyword-faces '(("HOLD" . warning)
                                  ("❓" . warning))
         org-priority-faces '((?A . error)
                              (?B . warning)
@@ -327,6 +327,8 @@ prepended to the element after the #+HEADER: tag."
            ("C-c n g" . org-roam-graph)
            ("C-c n i" . org-roam-node-insert)
            ("C-c n c" . org-roam-capture)
+           :map org-mode-map
+           ("C-M-i" . completion-at-point)
            ("C-c n j" . org-roam-dailies-capture-today))
     :init
     (setq org-roam-directory (expand-file-name "roam" (file-truename centaur-org-directory)))
@@ -334,6 +336,7 @@ prepended to the element after the #+HEADER: tag."
     (unless (file-exists-p org-roam-directory)
       (make-directory org-roam-directory))
 
+    (org-roam-db-autosync-mode)
 
     (setq org-roam-dailies-capture-templates
           `(("d" "daily" plain "* %?"
