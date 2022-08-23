@@ -214,12 +214,9 @@ prepended to the element after the #+HEADER: tag."
         org-src-tab-acts-natively t)
 
   (defvar load-language-alist '((emacs-lisp . t)
-                                (perl       . t)
                                 (python     . t)
-                                (ruby       . t)
                                 (js         . t)
                                 (css        . t)
-                                (sass       . t)
                                 (C          . t)
                                 (java       . t)
                                 (plantuml   . t)))
@@ -227,11 +224,12 @@ prepended to the element after the #+HEADER: tag."
   ;; ob-sh renamed to ob-shell since 26.1.
   (cl-pushnew '(shell . t) load-language-alist)
 
-  (use-package ob-go
-    :init (cl-pushnew '(go . t) load-language-alist))
+  ;; (use-package ob-csharp
+  ;;   :straight `(:type git :repo "thomas-villagers/ob-csharp" :host github)
+  ;;   :init (cl-pushnew '(csharp . t) load-language-alist))
 
-  (use-package ob-rust
-    :init (cl-pushnew '(rust . t) load-language-alist))
+  (use-package ob-typescript
+    :init (cl-pushnew '(typescript . t) load-language-alist))
 
   ;; Install: npm install -g @mermaid-js/mermaid-cli
   (use-package ob-mermaid
