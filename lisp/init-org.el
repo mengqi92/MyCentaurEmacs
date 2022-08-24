@@ -342,6 +342,11 @@ prepended to the element after the #+HEADER: tag."
 
     (org-roam-db-autosync-mode)
 
+    (setq org-roam-capture-templates '(("f" "fleeting note" plain "%?"
+                                        :target (file+head "${slug}.org"
+                                                           "#+title: ${title}\n#+filetags: :FleetingNotes:\n")
+                                        :unnarrowed t)))
+
     (setq org-roam-dailies-capture-templates
           `(("d" "daily" plain "* %?"
              :target (file+head "%<%Y %m %d>.org" "#+title: %<%Y-%m-%d>\n")
