@@ -327,12 +327,18 @@ prepended to the element after the #+HEADER: tag."
            ("C-c n c" . org-roam-capture)
            :map org-mode-map
            ("C-M-i" . completion-at-point)
+           ("C-c n n" . org-id-get-create)
+           ("C-c n t" . org-roam-tag-add)
            ("C-c n j" . org-roam-dailies-capture-today))
+    :custom
+    (org-roam-complete-everywhere t)
     :init
     (setq org-roam-directory (expand-file-name "roam" (file-truename centaur-org-directory)))
     :config
     (unless (file-exists-p org-roam-directory)
       (make-directory org-roam-directory))
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
     (org-roam-db-autosync-mode)
 
