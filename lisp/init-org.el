@@ -213,13 +213,15 @@ prepended to the element after the #+HEADER: tag."
         org-src-fontify-natively t
         org-src-tab-acts-natively t)
 
-  (defvar load-language-alist '((emacs-lisp . t)
-                                (python     . t)
-                                (js         . t)
-                                (css        . t)
-                                (C          . t)
-                                (java       . t)
-                                (plantuml   . t)))
+  (defconst load-language-alist 
+            '((emacs-lisp . t) 
+              (python     . t) 
+              (js         . t) 
+              (css        . t) 
+              (C          . t) 
+              (java       . t) 
+              (plantuml   . t))
+              "Alist of org ob languages.")
 
   ;; ob-sh renamed to ob-shell since 26.1.
   (cl-pushnew '(shell . t) load-language-alist)
