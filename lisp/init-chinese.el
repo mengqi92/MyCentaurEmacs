@@ -9,13 +9,11 @@
 
 (use-package cnfonts
   :config
-  ;; 让 cnfonts 在 Emacs 启动时自动生效。
-  (cnfonts-mode 1)
   ;; 添加两个字号增大缩小的快捷键
   (define-key cnfonts-mode-map (kbd "C--") #'cnfonts-decrease-fontsize)
   (define-key cnfonts-mode-map (kbd "C-=") #'cnfonts-increase-fontsize)
 
-  (setq cnfonts-personal-fontnames '(("Bookerly") ("LXGW Wenkai") nil ("Fira Code Symbol")))
+  (setq cnfonts-personal-fontnames '(("Roboto" "Roboto Light" "Roboto Mono Light" "Bookerly") ("LXGW Wenkai" "LXGW Wenkai GB Screen") ("HanaMin" "Noto Sans") ("Fira Code Symbol")))
 
   (setq cnfonts-profiles
         '("Reading" "Org Mode" "Programming"))
