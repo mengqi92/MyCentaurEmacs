@@ -123,11 +123,17 @@
                               name)))
                     centaur-package-archives-alist)))
 
+;; Nano theme
+;; https://github.com/rougier/nano-theme
+(straight-use-package '(nano-theme :type git :host github
+                                   :repo "rougier/nano-theme"))
+
 (defcustom centaur-theme-alist
   '((default . doom-one)
     (pro     . doom-monokai-pro)
     (dark    . doom-nord-aurora)
-    (light   . doom-one-light)
+    (light   . nano-light)
+    ;; (light   . doom-one-light)
     (warm    . doom-solarized-light)
     (cold    . doom-palenight)
     (day     . doom-tomorrow-day)
