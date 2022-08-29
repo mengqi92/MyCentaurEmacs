@@ -344,7 +344,11 @@ prepended to the element after the #+HEADER: tag."
 
     (setq org-roam-capture-templates '(("f" "fleeting note" plain "%?"
                                         :target (file+head "${slug}.org"
-                                                           "#+title: ${title}\n#+filetags: :FleetingNotes:\n")
+                                                           "#+title: ${title}\n#+filetags: :FleetingNote:\n")
+                                        :unnarrowed t)
+                                       ("l" "literature note" plain "%?"
+                                        :target (file+head "${slug}.org"
+                                                           "#+title: ${title}\n#+filetags: :LiteatureNote:\n")
                                         :unnarrowed t)))
 
     (setq org-roam-dailies-capture-templates
