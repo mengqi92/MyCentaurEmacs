@@ -269,6 +269,7 @@
                       (daemonp)
                       (font-installed-p "all-the-icons"))
             (centaur-install-fonts))
+    :after cnfonts
     :config
     ;; Support more icons
     (let ((extension-icon-alist
