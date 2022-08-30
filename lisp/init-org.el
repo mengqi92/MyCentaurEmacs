@@ -213,13 +213,13 @@ prepended to the element after the #+HEADER: tag."
         org-src-fontify-natively t
         org-src-tab-acts-natively t)
 
-  (defconst load-language-alist 
-            '((emacs-lisp . t) 
-              (python     . t) 
-              (js         . t) 
-              (css        . t) 
-              (C          . t) 
-              (java       . t) 
+  (defconst load-language-alist
+            '((emacs-lisp . t)
+              (python     . t)
+              (js         . t)
+              (css        . t)
+              (C          . t)
+              (java       . t)
               (plantuml   . t))
               "Alist of org ob languages.")
 
@@ -345,16 +345,16 @@ prepended to the element after the #+HEADER: tag."
     (org-roam-db-autosync-mode)
 
     (setq org-roam-capture-templates '(("d" "Default" plain "%?"
-                                        :target (file+head "${slug}.org"
+                                        :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                                                            "#+title: ${title}\n")
                                         :unnarrowed t)
                                        ("f" "Fleeting note" plain "%?"
-                                        :target (file+head "${slug}.org"
+                                        :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                                                            "#+title: ${title}\n#+filetags: :FleetingNote:\n")
                                         :unnarrowed t)
-                                       ("l" "Literature note" plain "%?"
-                                        :target (file+head "${slug}.org"
-                                                           "#+title: ${title}\n#+filetags: :LiteratureNote:\n\n\n* References\n** ")
+                                       ("l" "Literature note" plain (file "~/org/roam/templates/literature_note_template.org")
+                                        :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                                                           "#+title: ${title}\n#+filetags: :LiteratureNote:\n")
                                         :unnarrowed t)))
 
     (setq org-roam-dailies-capture-templates
