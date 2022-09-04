@@ -362,12 +362,48 @@ prepended to the element after the #+HEADER: tag."
              :target (file+head "%<%Y %m %d>.org" "#+title: %<%Y-%m-%d>\n")
              :unarrowed t)))
 
+    ;; Configure org-roam buffer display.
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-direction)
+                   (direction . right)
+                   (window-width . 0.33)
+                   (window-height . fit-window-to-buffer)))
 
     (when emacs/>=27p
       (use-package org-roam-ui
         :init
         (when (featurep 'xwidget-internal)
-          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))))))
+          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
+        :config
+        (setq org-roam-ui-sync-theme t
+              org-roam-ui-follow t
+              org-roam-ui-update-on-save t
+              org-roam-ui-open-on-start t)))))
+
+(use-package org-ref
+  :config
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+  (setq bibtex-completion-bibliography '("~/org/roam/references/ref.bib")
+	    bibtex-completion-library-path '("~/org/roam/references/")
+	    bibtex-completion-notes-path "~/org/roam/references/notes/"
+	    bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+	    bibtex-completion-additional-search-fields '(keywords)
+	    bibtex-completion-display-formats
+	    '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+	      (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+	      (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	      (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	      (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+	    bibtex-completion-pdf-open-function
+	    (lambda (fpath)
+	      (call-process "open" nil 0 nil fpath))))
+
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (require 'org-ref))
 
 (provide 'init-org)
 
