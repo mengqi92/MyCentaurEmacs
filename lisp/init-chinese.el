@@ -45,6 +45,10 @@
 
 (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
 
+(use-package rime
+  :custom
+  (default-input-method "rime"))
+
 (provide 'init-chinese)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
