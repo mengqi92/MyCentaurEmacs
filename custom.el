@@ -12,14 +12,14 @@
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 ;; (setq centaur-icon nil)                        ; Display icons or not: t or nil
 (setq centaur-package-archives 'tuna)         ; Package repo: melpa, emacs-cn, netease, ustc, tencent or tuna
-(setq centaur-theme 'light)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
+(setq centaur-theme 'day)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
 ;; (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
 (setq centaur-restore-frame-geometry t)      ; Restore the frame's geometry at startup: t or nil
 ;; (setq centaur-lsp 'eglot)                      ; Set LSP client: lsp-mode, eglot or nil
 ;; (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
 ;; (setq centaur-tree-sitter t)                   ; Enable `tree-sitter' or not: t or nil
-;; (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
+(setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 ;; (setq centaur-player t)                        ; Enable players or not: t or nil
 (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
 ;; (setq centaur-prettify-org-symbols-alist nil)  ; Alist of symbol prettifications for `org-mode'
