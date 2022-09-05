@@ -71,7 +71,8 @@
     ;;          when (font-installed-p font)
     ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
     ;; (cnfonts-mode 1)
-    (nano-modeline-mode)))
+    (nano-modeline-mode)
+    ))
 
 (centaur-setup-fonts)
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
