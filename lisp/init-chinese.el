@@ -47,7 +47,11 @@
 
 (use-package rime
   :custom
-  (default-input-method "rime"))
+  (default-input-method "rime")
+  :config
+  (setq rime-user-data-dir "~/rime/")
+  (setq rime-share-data-dir "/usr/share/rime-data")
+  )
 
 (provide 'init-chinese)
 
