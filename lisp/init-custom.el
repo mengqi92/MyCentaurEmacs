@@ -125,8 +125,12 @@
 
 ;; Nano theme
 ;; https://github.com/rougier/nano-theme
-(straight-use-package '(nano-theme :type git :host github
-                                   :repo "rougier/nano-theme"))
+(use-package nano-theme
+  :ensure t
+  :straight `(nano-theme :type git :host github
+                         :repo "rougier/nano-theme"))
+;;(use-package nano-modeline
+  ;;:ensure t)
 
 (defcustom centaur-theme-alist
   '((default . doom-one)
