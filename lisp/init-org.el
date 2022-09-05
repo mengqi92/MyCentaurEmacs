@@ -214,14 +214,14 @@ prepended to the element after the #+HEADER: tag."
         org-src-tab-acts-natively t)
 
   (defconst load-language-alist
-            '((emacs-lisp . t)
-              (python     . t)
-              (js         . t)
-              (css        . t)
-              (C          . t)
-              (java       . t)
-              (plantuml   . t))
-              "Alist of org ob languages.")
+    '((emacs-lisp . t)
+      (python     . t)
+      (js         . t)
+      (css        . t)
+      (C          . t)
+      (java       . t)
+      (plantuml   . t))
+    "Alist of org ob languages.")
 
   ;; ob-sh renamed to ob-shell since 26.1.
   (cl-pushnew '(shell . t) load-language-alist)
@@ -317,6 +317,8 @@ prepended to the element after the #+HEADER: tag."
         ("K" . org-pomodoro)
         ("C-c C-x m" . org-pomodoro)))))
 
+(use-package writeroom-mode)
+
 ;; Roam
 (when (executable-find "cc")
   (use-package org-roam
@@ -372,9 +374,9 @@ prepended to the element after the #+HEADER: tag."
 
     (when emacs/>=27p
       (use-package org-roam-ui
-        :init
-        (when (featurep 'xwidget-internal)
-          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
+        ;; :init
+        ;; (when (featurep 'xwidget-internal)
+        ;;   (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
         :config
         (setq org-roam-ui-sync-theme t
               org-roam-ui-follow t
@@ -384,6 +386,7 @@ prepended to the element after the #+HEADER: tag."
 (use-package org-ref
   :config
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+  ;; TODO: use variable for defining paths in difference OS.
   (setq bibtex-completion-bibliography '("~/org/roam/references/ref.bib")
 	    bibtex-completion-library-path '("~/org/roam/references/")
 	    bibtex-completion-notes-path "~/org/roam/references/notes/"
@@ -401,6 +404,7 @@ prepended to the element after the #+HEADER: tag."
 	      (call-process "open" nil 0 nil fpath))))
 
 (use-package org-roam-bibtex
+  :ensure t
   :after org-roam
   :config
   (require 'org-ref))
