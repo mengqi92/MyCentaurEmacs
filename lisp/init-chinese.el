@@ -50,7 +50,7 @@
   :custom
   (default-input-method "rime")
   :config
-  (setq rime-user-data-dir "~/rime/")
+  (setq rime-user-data-dir "~/emacs-rime/")
   (setq rime-share-data-dir "/usr/share/rime-data")
   ;; 断言成立时关闭输入法
   ;; (setq rime-disable-predicates t)

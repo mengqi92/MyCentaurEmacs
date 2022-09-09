@@ -387,10 +387,9 @@ prepended to the element after the #+HEADER: tag."
 (use-package org-ref
   :config
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  ;; TODO: use variable for defining paths in difference OS.
-  (setq bibtex-completion-bibliography '("~/org/roam/references/ref.bib")
-	    bibtex-completion-library-path '("~/org/roam/references/")
-	    bibtex-completion-notes-path "~/org/roam/references/notes/"
+  (setq bibtex-completion-bibliography (concat org-roam-directory "/references/ref.bib")
+	    bibtex-completion-library-path (concat org-roam-directory "/references/")
+	    bibtex-completion-notes-path (concat org-roam-directory "/references/notes/")
 	    bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
 	    bibtex-completion-additional-search-fields '(keywords)
