@@ -326,13 +326,14 @@ prepended to the element after the #+HEADER: tag."
     :hook (after-init . org-roam-db-autosync-enable)
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
+           ;; ("C-c n g" . org-roam-graph)
            ("C-c n i" . org-roam-node-insert)
            ("C-c n c" . org-roam-capture)
            :map org-mode-map
            ("C-M-i" . completion-at-point)
            ("C-c n n" . org-id-get-create)
            ("C-c n t" . org-roam-tag-add)
+           ("C-c n r" . org-roam-ref-add)
            ("C-c n j" . org-roam-dailies-capture-today))
     :custom
     (org-roam-complete-everywhere t)
