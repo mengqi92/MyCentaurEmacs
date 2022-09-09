@@ -45,12 +45,38 @@
 
 (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
 
+;; RIME input method
 (use-package rime
   :custom
   (default-input-method "rime")
   :config
   (setq rime-user-data-dir "~/rime/")
   (setq rime-share-data-dir "/usr/share/rime-data")
+  ;; 断言成立时关闭输入法
+  ;; (setq rime-disable-predicates t)
+  ;; 断言成立时进入 inline ascii 模式
+  ;; (setq rime-inline-predicates t)
+
+  (defun +rime-predicate-beancount-p ()
+    "Predicate input state in `beancount-mode.'
+
+Determines whether current buffer's `major-mode' is
+`beancount-mode', and the cursor is at the beginning of the
+line."
+    (when (derived-mode-p 'beancount-mode)
+      (not (or (nth 3 (syntax-ppss))
+               (nth 4 (syntax-ppss))))))
+
+  (setq-default rime-disable-predicates '(rime-predicate-evil-mode-p
+                                          rime-predicate-auto-english-p
+                                          rime-predicate-punctuation-line-begin-p))
+
+  (add-hook 'beancount-mode-hook
+            (lambda () (setq-local rime-disable-predicates
+                               '(rime-predicate-evil-mode-p
+                                 +rime-predicate-beancount-p
+                                 rime-predicate-auto-english-p
+                                 rime--punctuation-line-begin-p))))
   )
 
 (provide 'init-chinese)
