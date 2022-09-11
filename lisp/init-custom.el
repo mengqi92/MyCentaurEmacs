@@ -69,6 +69,11 @@
   :group 'centaur
   :type 'string)
 
+(defcustom centaur-org-agenda-directory (if (or on-home-linux-desktop on-macbook) (expand-file-name "~/self/tasks/"))
+  "Set org directory."
+  :group 'centaur
+  :type 'string)
+
 (defcustom centaur-proxy "127.0.0.1:1087"
   "Set HTTP/HTTPS proxy."
   :group 'centaur

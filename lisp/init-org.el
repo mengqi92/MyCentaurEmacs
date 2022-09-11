@@ -147,7 +147,7 @@ prepended to the element after the #+HEADER: tag."
                              (?C . success))
 
         ;; Agenda styling
-        org-agenda-files `(,centaur-org-directory)
+        org-agenda-files `(,centaur-org-agenda-directory)
         org-agenda-block-separator ?─
         org-agenda-time-grid
         '((daily today require-timed)
