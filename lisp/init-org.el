@@ -317,6 +317,23 @@ prepended to the element after the #+HEADER: tag."
         ("K" . org-pomodoro)
         ("C-c C-x m" . org-pomodoro)))))
 
+;; Emphasis faces
+(defface my-org-verbatim
+  '((default :inherit org-verbatim)
+    (((class color) (min-colors 88) (background light))
+     :foreground "#aa0000" :underline t :overline t)
+    (((class color) (min-colors 88) (background dark))
+     :foreground "#ffa059" :underline t :overline t)
+    )
+  "My custom face for org verbatim.")
+(setq org-emphasis-alist
+      '(("*" bold)
+        ("/" italic)
+        ("_" underline)
+        ("=" my-org-verbatim verbatim)
+        ("~" org-code verbatim)
+        ("+") (:strike-through t)))
+
 (use-package writeroom-mode)
 
 ;; Roam
