@@ -25,7 +25,7 @@
   (setq cnfonts-personal-fontnames '(("Roboto" "Roboto Light" "Roboto Mono Light" "Bookerly") ("LXGW Wenkai" "LXGW Wenkai GB Screen") ("HanaMin" "Noto Sans") ("Fira Code Symbol")))
 
   (setq cnfonts-profiles
-        '("Reading" "Org Mode" "Programming"))
+        '("MonoReading" "Reading" "Programming"))
   (cnfonts-enable))
 
 (defvar my-line-spacing-alist
@@ -44,6 +44,17 @@
         (setq-default line-spacing (cdr list))))))
 
 (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
+
+;; Ace-jump-pinyin
+;; Jump to Chinese characters
+(use-package ace-pinyin
+  :diminish
+  :hook (after-init . ace-pinyin-global-mode))
+
+;; Evil find (f/F/t/T) pinyin support
+(use-package evil-find-char-pinyin
+  :config
+  (evil-find-char-pinyin-mode +1))
 
 ;; RIME input method
 (use-package rime
