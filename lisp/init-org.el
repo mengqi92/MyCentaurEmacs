@@ -332,7 +332,8 @@ prepended to the element after the #+HEADER: tag."
         ("_" underline)
         ("=" my-org-verbatim verbatim)
         ("~" org-code verbatim)
-        ("+") (:strike-through t)))
+        ("+" (:strike-through t)))
+      )
 
 (use-package writeroom-mode)
 
