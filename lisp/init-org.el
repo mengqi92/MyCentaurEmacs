@@ -40,7 +40,7 @@
   :custom-face (org-ellipsis ((t (:foreground nil))))
   :pretty-hydra
   ((:title (pretty-hydra-title "Org Template" 'fileicon "org" :face 'all-the-icons-green :height 1.1 :v-adjust 0.0)
-    :color blue :quit-key "q")
+           :color blue :quit-key "q")
    ("Basic"
     (("a" (hot-expand "<a") "ascii")
      ("c" (hot-expand "<c") "center")
@@ -164,6 +164,28 @@ prepended to the element after the #+HEADER: tag."
         org-pretty-entities nil
         org-hide-emphasis-markers t)
 
+
+  ;; Emphasis faces
+  (defface my-org-verbatim
+    '((default :inherit org-verbatim)
+      (((class color) (min-colors 88) (background light))
+       :foreground "#aa0000" :underline t :overline t)
+      (((class color) (min-colors 88) (background dark))
+       :foreground "#ffa059" :underline t :overline t)
+      )
+    "My custom face for org verbatim.")
+  (add-to-list 'org-emphasis-alist
+               `("=" my-org-verbatim verbatim))
+
+  ;; (setq org-emphasis-alist
+  ;;       '(("*" bold)
+  ;;         ("/" italic)
+  ;;         ("_" underline)
+  ;;         ("=" my-org-verbatim verbatim)
+  ;;         ("~" org-code verbatim)
+  ;;         ("+" (:strike-through t)))
+  ;;       )
+
   ;; Add new template
   (add-to-list 'org-structure-template-alist '("n" . "note"))
 
@@ -205,8 +227,8 @@ prepended to the element after the #+HEADER: tag."
                         '("🅐" "🅑" "🅒" "🅓")
                       '("HIGH" "MEDIUM" "LOW" "OPTIONAL"))))))
 
-  (use-package valign
-    :hook (org-mode . valign-mode))
+  ;; (use-package valign
+  ;;   :hook (org-mode . valign-mode))
 
   ;; Babel
   (setq org-confirm-babel-evaluate nil
@@ -243,7 +265,7 @@ prepended to the element after the #+HEADER: tag."
   ;; Rich text clipboard
   (use-package org-rich-yank
     :bind (:map org-mode-map
-           ("C-M-y" . org-rich-yank)))
+                ("C-M-y" . org-rich-yank)))
 
   ;; Table of contents
   (use-package toc-org
@@ -252,9 +274,9 @@ prepended to the element after the #+HEADER: tag."
   ;; Export text/html MIME emails
   (use-package org-mime
     :bind (:map message-mode-map
-           ("C-c M-o" . org-mime-htmlize)
-           :map org-mode-map
-           ("C-c M-o" . org-mime-org-buffer-htmlize)))
+                ("C-c M-o" . org-mime-htmlize)
+                :map org-mode-map
+                ("C-c M-o" . org-mime-org-buffer-htmlize)))
 
   ;; Add graphical view of agenda
   (use-package org-timeline
@@ -270,7 +292,7 @@ prepended to the element after the #+HEADER: tag."
     (use-package org-preview-html
       :diminish
       :bind (:map org-mode-map
-             ("C-c C-h" . org-preview-html-mode))
+                  ("C-c C-h" . org-preview-html-mode))
       :init (when (featurep 'xwidget-internal)
               (setq org-preview-html-viewer 'xwidget))))
 
@@ -280,12 +302,12 @@ prepended to the element after the #+HEADER: tag."
     :functions (org-display-inline-images
                 org-remove-inline-images)
     :bind (:map org-mode-map
-           ("s-<f7>" . org-tree-slide-mode)
-           :map org-tree-slide-mode-map
-           ("<left>" . org-tree-slide-move-previous-tree)
-           ("<right>" . org-tree-slide-move-next-tree)
-           ("S-SPC" . org-tree-slide-move-previous-tree)
-           ("SPC" . org-tree-slide-move-next-tree))
+                ("s-<f7>" . org-tree-slide-mode)
+                :map org-tree-slide-mode-map
+                ("<left>" . org-tree-slide-move-previous-tree)
+                ("<right>" . org-tree-slide-move-next-tree)
+                ("S-SPC" . org-tree-slide-move-previous-tree)
+                ("SPC" . org-tree-slide-move-next-tree))
     :hook ((org-tree-slide-play . (lambda ()
                                     (text-scale-increase 4)
                                     (org-display-inline-images)
@@ -310,30 +332,12 @@ prepended to the element after the #+HEADER: tag."
     (org-pomodoro-mode-line-overtime ((t (:inherit error))))
     (org-pomodoro-mode-line-break ((t (:inherit success))))
     :bind (:map org-mode-map
-           ("C-c C-x m" . org-pomodoro))
+                ("C-c C-x m" . org-pomodoro))
     :init
     (with-eval-after-load 'org-agenda
       (bind-keys :map org-agenda-mode-map
-        ("K" . org-pomodoro)
-        ("C-c C-x m" . org-pomodoro)))))
-
-;; Emphasis faces
-(defface my-org-verbatim
-  '((default :inherit org-verbatim)
-    (((class color) (min-colors 88) (background light))
-     :foreground "#aa0000" :underline t :overline t)
-    (((class color) (min-colors 88) (background dark))
-     :foreground "#ffa059" :underline t :overline t)
-    )
-  "My custom face for org verbatim.")
-(setq org-emphasis-alist
-      '(("*" bold)
-        ("/" italic)
-        ("_" underline)
-        ("=" my-org-verbatim verbatim)
-        ("~" org-code verbatim)
-        ("+" (:strike-through t)))
-      )
+                 ("K" . org-pomodoro)
+                 ("C-c C-x m" . org-pomodoro)))))
 
 (use-package writeroom-mode)
 
@@ -363,6 +367,8 @@ prepended to the element after the #+HEADER: tag."
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
+    (require 'org-roam-export)
+
     (org-roam-db-autosync-mode)
 
     (setq org-roam-capture-templates '(("d" "Default" plain "%?"
@@ -391,6 +397,31 @@ prepended to the element after the #+HEADER: tag."
                    (window-width . 0.33)
                    (window-height . fit-window-to-buffer)))
 
+    (use-package org-ref
+      :config
+      (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+      (setq bibtex-completion-bibliography (concat org-roam-directory "/references/ref.bib")
+	        bibtex-completion-library-path (concat org-roam-directory "/references/")
+	        bibtex-completion-notes-path (concat org-roam-directory "/references/notes/")
+	        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+	        bibtex-completion-additional-search-fields '(keywords)
+	        bibtex-completion-display-formats
+	        '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+	          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+	          (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	          (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+	          (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+	        bibtex-completion-pdf-open-function
+	        (lambda (fpath)
+	          (call-process "open" nil 0 nil fpath))))
+
+    (use-package org-roam-bibtex
+      :ensure t
+      :after org-roam
+      :config
+      (require 'org-ref))
+
     (when emacs/>=27p
       (use-package org-roam-ui
         ;; :init
@@ -401,31 +432,6 @@ prepended to the element after the #+HEADER: tag."
               org-roam-ui-follow t
               org-roam-ui-update-on-save t
               org-roam-ui-open-on-start t)))))
-
-(use-package org-ref
-  :config
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  (setq bibtex-completion-bibliography (concat org-roam-directory "/references/ref.bib")
-	    bibtex-completion-library-path (concat org-roam-directory "/references/")
-	    bibtex-completion-notes-path (concat org-roam-directory "/references/notes/")
-	    bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
-
-	    bibtex-completion-additional-search-fields '(keywords)
-	    bibtex-completion-display-formats
-	    '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-	      (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
-	      (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-	      (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-	      (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-	    bibtex-completion-pdf-open-function
-	    (lambda (fpath)
-	      (call-process "open" nil 0 nil fpath))))
-
-(use-package org-roam-bibtex
-  :ensure t
-  :after org-roam
-  :config
-  (require 'org-ref))
 
 (provide 'init-org)
 
