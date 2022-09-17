@@ -398,8 +398,10 @@ prepended to the element after the #+HEADER: tag."
                    (window-height . fit-window-to-buffer)))
 
     (use-package org-ref
+      :bind (:map org-mode-map
+             ("C-c ]" . org-ref-insert-link)
+             ("C-c [" . org-ref-insert-link-hydra/body))
       :config
-      (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
       (setq bibtex-completion-bibliography (concat org-roam-directory "/references/ref.bib")
 	        bibtex-completion-library-path (concat org-roam-directory "/references/")
 	        bibtex-completion-notes-path (concat org-roam-directory "/references/notes/")
