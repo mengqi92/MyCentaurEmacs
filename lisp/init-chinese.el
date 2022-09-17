@@ -79,7 +79,6 @@ line."
                (nth 4 (syntax-ppss))))))
 
   (setq-default rime-disable-predicates '(rime-predicate-evil-mode-p
-                                          rime-predicate-auto-english-p
                                           rime-predicate-punctuation-line-begin-p))
 
   (add-hook 'beancount-mode-hook
@@ -87,7 +86,27 @@ line."
                                '(rime-predicate-evil-mode-p
                                  +rime-predicate-beancount-p
                                  rime-predicate-auto-english-p
-                                 rime--punctuation-line-begin-p))))
+                                 rime-predicate-punctuation-line-begin-p))))
+
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda () (setq-local rime-disable-predicates
+                               '(rime-predicate-evil-mode-p
+                                 rime-predicate-prog-in-code-p))))
+
+  (add-hook 'org-mode-hook
+            (lambda () (setq-local rime-disable-predicates
+                               '(rime-predicate-evil-mode-p
+                                 rime-predicate-auto-english-p
+                                 rime-predicate-org-latex-mode-p
+                                 rime-predicate-org-in-src-block-p
+                                 rime-predicate-punctuation-line-begin-p))))
+
+  (add-hook 'org-roam-mode-hook
+            (lambda () (setq-local rime-disable-predicates
+                               '(rime-predicate-evil-mode-p
+                                 rime-predicate-auto-english-p
+                                 rime-predicate-punctuation-line-begin-p))))
+
   )
 
 (provide 'init-chinese)
