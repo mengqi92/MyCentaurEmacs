@@ -83,8 +83,10 @@
 (set-frame-width (selected-frame) 110)
 (set-frame-height (selected-frame) 33)
 
+;; 快捷键设置
 ;; 设置选择区域快捷键
 (global-set-key (kbd "C-.") 'set-mark-command)
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region)
 
 ;; Mail
 ;; (setq message-send-mail-function 'smtpmail-send-it
