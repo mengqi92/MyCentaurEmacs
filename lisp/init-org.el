@@ -415,6 +415,7 @@ prepended to the element after the #+HEADER: tag."
 	          (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
 	          (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
 	        bibtex-completion-pdf-open-function
+
 	        (lambda (fpath)
 	          (call-process "open" nil 0 nil fpath))))
 
@@ -422,7 +423,8 @@ prepended to the element after the #+HEADER: tag."
       :ensure t
       :after org-roam
       :config
-      (require 'org-ref))
+      (require 'org-ref)
+      (setq bibtex-dialect 'biblatex))
 
     (when emacs/>=27p
       (use-package org-roam-ui
