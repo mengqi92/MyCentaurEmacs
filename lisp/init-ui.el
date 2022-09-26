@@ -408,26 +408,26 @@
 
 ;;; variable-pitch
 
-(custom-theme-set-faces
- 'user
- '(fixed-pitch ((t (:family "Roboto Mono Light" :height 1.0))))
- '(variable-pitch ((t (:family "Bookerly" :height 1.0))))
- '(mode-line ((t (:inherit variable-pitch :height 1.0))))
- '(mode-line-inactive ((t (:inherit variable-pitch :height 1.0))))
- '(Info-quoted ((t (:inherit fixed-pitch))))
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 1.0))))
- '(my-org-verbatim ((t (:inherit (shadow fixed-pitch)))))
- )
+;; (custom-theme-set-faces
+;;  'user
+;;  '(fixed-pitch ((t (:family "Roboto Mono Light" :height 140))))
+;;  '(variable-pitch ((t (:family "Bookerly" :height 140))))
+;;  '(mode-line ((t (:inherit variable-pitch :height 1.0))))
+;;  '(mode-line-inactive ((t (:inherit variable-pitch :height 1.0))))
+;;  '(Info-quoted ((t (:inherit fixed-pitch))))
+;;  '(org-block ((t (:inherit fixed-pitch))))
+;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+;;  '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-property-value ((t (:inherit fixed-pitch))) t)
+;;  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-table ((t (:inherit fixed-pitch))))
+;;  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 1.0))))
+;;  '(my-org-verbatim ((t (:inherit (shadow fixed-pitch)))))
+;;  )
 
-(add-hook 'org-mode-hook #'variable-pitch-mode)
+;; (add-hook 'org-mode-hook #'variable-pitch-mode)
 
 ;; Display ugly ^L page breaks as tidy horizontal lines
 (use-package page-break-lines
