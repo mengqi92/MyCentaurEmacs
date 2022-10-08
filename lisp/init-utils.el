@@ -262,13 +262,13 @@ of the buffer text to be displayed in the popup"
                  [simple-query "wikipedia.org" "wikipedia.org/wiki/" ""]))))
 
 ;; IRC
-(use-package erc
-  :ensure nil
-  :defines erc-autojoin-channels-alist
-  :init (setq erc-rename-buffers t
-              erc-interpret-mirc-color t
-              erc-lurker-hide-list '("JOIN" "PART" "QUIT")
-              erc-autojoin-channels-alist '(("freenode.net" "#emacs"))))
+;; (use-package erc
+;;   :ensure nil
+;;   :defines erc-autojoin-channels-alist
+;;   :init (setq erc-rename-buffers t
+;;               erc-interpret-mirc-color t
+;;               erc-lurker-hide-list '("JOIN" "PART" "QUIT")
+;;               erc-autojoin-channels-alist '(("freenode.net" "#emacs"))))
 
 ;; text mode directory tree
 (use-package ztree
@@ -339,6 +339,18 @@ of the buffer text to be displayed in the popup"
 (unless sys/win32p
   (use-package daemons)                 ; system services/daemons
   (use-package tldr))
+
+(defun on-host (hostname)
+  "Return non-nil when the current system is `hostname'."
+  (string-equal (system-name) hostname))
+
+(defconst on-linux (string-equal system-type "gnu/linux"))
+(defconst on-windows (string-equal system-type "windows-nt"))
+(defconst on-mac (string-equal system-type "darwin"))
+
+(defconst on-macbook (on-host "TODO.local"))
+(defconst on-home-linux-desktop (and on-linux (on-host "fedora-silver")))
+(defconst on-home-windows-desktop-wsl (and on-linux (on-host "TODO")))
 
 (provide 'init-utils)
 

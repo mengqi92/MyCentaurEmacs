@@ -30,6 +30,18 @@
 
 ;;; Code:
 
+(defun on-host (hostname)
+  "Return non-nil when the current system is `hostname'."
+  (string-equal (system-name) hostname))
+
+(defconst on-linux (string-equal system-type "gnu/linux"))
+(defconst on-windows (string-equal system-type "windows-nt"))
+(defconst on-mac (string-equal system-type "darwin"))
+
+(defconst on-macbook (on-host "TODO.local"))
+(defconst on-home-linux-desktop (and on-linux (on-host "fedora-silver")))
+(defconst on-home-windows-desktop-wsl (and on-linux (on-host "TODO")))
+
 (defgroup centaur nil
   "Centaur Emacs customization."
   :group 'convenience
@@ -52,7 +64,12 @@
   :group 'centaur
   :type 'string)
 
-(defcustom centaur-org-directory (expand-file-name "~/org/")
+(defcustom centaur-org-directory (if (or on-home-linux-desktop on-macbook) (expand-file-name "~/org/"))
+  "Set org directory."
+  :group 'centaur
+  :type 'string)
+
+(defcustom centaur-org-agenda-directory (if (or on-home-linux-desktop on-macbook) (expand-file-name "~/self/tasks/"))
   "Set org directory."
   :group 'centaur
   :type 'string)
