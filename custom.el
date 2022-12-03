@@ -31,9 +31,9 @@
 
 
 ;; Fonts
-(defun centaur-setup-fonts ()
-  "Setup fonts."
-  (when (display-graphic-p)
+;; (defun centaur-setup-fonts ()
+;;   "Setup fonts."
+;;   (when (display-graphic-p)
     ;; Set default font
     ;; (cl-loop for font in '("Roboto" "Fira Code" "Bookerly" "Cascadia Code" "Jetbrains Mono"
     ;;                        "SF Mono" "Hack" "Source Code Pro" "Menlo"
@@ -71,12 +71,12 @@
     ;;          when (font-installed-p font)
     ;;          return (set-fontset-font t '(#x4e00 . #x9fff) font))
     ;; (cnfonts-mode 1)
-    (nano-modeline-mode)
-    ))
+    ;; (nano-modeline-mode)
+;; ))
 
-(centaur-setup-fonts)
-(add-hook 'window-setup-hook #'centaur-setup-fonts)
-(add-hook 'server-after-make-frame-hook #'centaur-setup-fonts)
+;; (centaur-setup-fonts)
+;; (add-hook 'window-setup-hook #'centaur-setup-fonts)
+;; (add-hook 'server-after-make-frame-hook #'centaur-setup-fonts)
 
 ;;设置窗口位置为屏幕左上角(0,0)
 (set-frame-position (selected-frame) 0 0)

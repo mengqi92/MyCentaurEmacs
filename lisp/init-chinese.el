@@ -63,6 +63,7 @@
   :config
   (setq rime-user-data-dir "~/emacs-rime/")
   (setq rime-share-data-dir "/usr/share/rime-data")
+  (when on-macbook (setq rime-librime-root "~/.emacs.d/librime/dist"))
   ;; 断言成立时关闭输入法
   ;; (setq rime-disable-predicates t)
   ;; 断言成立时进入 inline ascii 模式
@@ -83,29 +84,29 @@ line."
 
   (add-hook 'beancount-mode-hook
             (lambda () (setq-local rime-disable-predicates
-                               '(rime-predicate-evil-mode-p
-                                 +rime-predicate-beancount-p
-                                 rime-predicate-auto-english-p
-                                 rime-predicate-punctuation-line-begin-p))))
+                              '(rime-predicate-evil-mode-p
+                                +rime-predicate-beancount-p
+                                rime-predicate-auto-english-p
+                                rime-predicate-punctuation-line-begin-p))))
 
   (add-hook 'emacs-lisp-mode-hook
             (lambda () (setq-local rime-disable-predicates
-                               '(rime-predicate-evil-mode-p
-                                 rime-predicate-prog-in-code-p))))
+                              '(rime-predicate-evil-mode-p
+                                rime-predicate-prog-in-code-p))))
 
   (add-hook 'org-mode-hook
             (lambda () (setq-local rime-disable-predicates
-                               '(rime-predicate-evil-mode-p
-                                 rime-predicate-auto-english-p
-                                 rime-predicate-org-latex-mode-p
-                                 rime-predicate-org-in-src-block-p
-                                 rime-predicate-punctuation-line-begin-p))))
+                              '(rime-predicate-evil-mode-p
+                                rime-predicate-auto-english-p
+                                rime-predicate-org-latex-mode-p
+                                rime-predicate-org-in-src-block-p
+                                rime-predicate-punctuation-line-begin-p))))
 
   (add-hook 'org-roam-mode-hook
             (lambda () (setq-local rime-disable-predicates
-                               '(rime-predicate-evil-mode-p
-                                 rime-predicate-auto-english-p
-                                 rime-predicate-punctuation-line-begin-p)))))
+                              '(rime-predicate-evil-mode-p
+                                rime-predicate-auto-english-p
+                                rime-predicate-punctuation-line-begin-p)))))
 
 ;; [[https://emacs-china.org/t/org-mode/22313][不用零宽空格在 org-mode 中标记中文的办法]]
 (font-lock-add-keywords 'org-mode
