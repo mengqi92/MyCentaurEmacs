@@ -4,11 +4,14 @@
 ;;;       Put your own configurations in custom-post.el to override default configurations.
 ;;; Code:
 
+(defalias 'which-key-declare-prefixes 'ignore)
+(defalias 'which-key-declare-prefixes-for-mode 'ignore)
+
 ;; (setq centaur-logo nil)                        ; Logo file or nil (official logo)
 (setq centaur-full-name "Mengqi Pei")           ; User full name
 (setq centaur-mail-address "mengqipei@gmail.com")   ; Email address
-(setq centaur-proxy "127.0.0.1:1080")          ; HTTP/HTTPS proxy
-(setq centaur-socks-proxy "127.0.0.1:1081")    ; SOCKS proxy
+(setq centaur-proxy "127.0.0.1:9090")          ; HTTP/HTTPS proxy
+(setq centaur-socks-proxy "127.0.0.1:9092")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 ;; (setq centaur-icon nil)                        ; Display icons or not: t or nil
 (setq centaur-package-archives 'tuna)         ; Package repo: melpa, emacs-cn, netease, ustc, tencent or tuna

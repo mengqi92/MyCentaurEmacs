@@ -38,7 +38,7 @@
 (defconst on-windows (string-equal system-type "windows-nt"))
 (defconst on-mac (string-equal system-type "darwin"))
 
-(defconst on-macbook (on-host "MengqiMBP"))
+(defconst on-macbook (or (on-host "MengqiMBP") (on-host "BigMac")))
 (defconst on-home-linux-desktop (and on-linux (on-host "fedora-silver")))
 (defconst on-home-windows-desktop-wsl (and on-linux (on-host "TODO")))
 
@@ -74,12 +74,12 @@
   :group 'centaur
   :type 'string)
 
-(defcustom centaur-proxy "127.0.0.1:1087"
+(defcustom centaur-proxy "127.0.0.1:9090"
   "Set HTTP/HTTPS proxy."
   :group 'centaur
   :type 'string)
 
-(defcustom centaur-socks-proxy "127.0.0.1:1086"
+(defcustom centaur-socks-proxy "127.0.0.1:9092"
   "Set SOCKS proxy."
   :group 'centaur
   :type 'string)
