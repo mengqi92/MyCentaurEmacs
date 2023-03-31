@@ -39,11 +39,8 @@
 (defvar socks-noproxy)
 (defvar socks-server)
 
-(declare-function async-inject-variables 'async)
 (declare-function chart-bar-quickie 'chart)
-(declare-function flycheck-buffer 'flycheck)
-(declare-function flymake-start 'flymake)
-(declare-function upgrade-packages 'init-package)
+(declare-function xwidget-webkit-current-session 'xwidget)
 
 
 
@@ -135,9 +132,9 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
                  (browse-url-interactive-arg "xwidget-webkit URL: ")))
   (or (featurep 'xwidget-internal)
       (user-error "Your Emacs was not compiled with xwidgets support"))
+
   (xwidget-webkit-browse-url url new-session)
-  (let ((buf (xwidget-buffer (and (fboundp 'xwidget-webkit-current-session)
-                                  (xwidget-webkit-current-session)))))
+  (let ((buf (xwidget-buffer (xwidget-webkit-current-session))))
     (when (buffer-live-p buf)
       (and (eq buf (current-buffer)) (quit-window))
       (if pop-buffer
@@ -196,20 +193,33 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
   (interactive)
   (save-buffer-as-utf8 'gbk))
 
-(defun recompile-elpa ()
-  "Recompile packages in elpa directory. Useful if you switch Emacs versions."
+(defun byte-compile-elpa ()
+  "Compile packages in elpa directory. Useful if you switch Emacs versions."
   (interactive)
   (if (fboundp 'async-byte-recompile-directory)
       (async-byte-recompile-directory package-user-dir)
     (byte-recompile-directory package-user-dir 0 t)))
 
-(defun recompile-site-lisp ()
-  "Recompile packages in site-lisp directory."
+(defun byte-compile-site-lisp ()
+  "Compile packages in site-lisp directory."
   (interactive)
   (let ((dir (locate-user-emacs-file "site-lisp")))
     (if (fboundp 'async-byte-recompile-directory)
         (async-byte-recompile-directory dir)
       (byte-recompile-directory dir 0 t))))
+
+(defun native-compile-elpa ()
+  "Native-compile packages in elpa directory."
+  (interactive)
+  (if (fboundp 'native-compile-async)
+      (native-compile-async package-user-dir t)))
+
+(defun native-compile-site-lisp ()
+  "Native compile packages in site-lisp directory."
+  (interactive)
+  (let ((dir (locate-user-emacs-file "site-lisp")))
+    (if (fboundp 'native-compile-async)
+        (native-compile-async dir t))))
 
 (defun icon-displayable-p ()
   "Return non-nil if icons are displayable."
@@ -217,6 +227,12 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
        (or (display-graphic-p) (daemonp))
        (or (featurep 'all-the-icons)
            (require 'all-the-icons nil t))))
+
+(defun centaur-treesit-available-p ()
+  "Check whether tree-sitter is available.
+Native tree-sitter is introduced since 29."
+  (and (fboundp 'treesit-available-p)
+       (treesit-available-p)))
 
 (defun centaur-set-variable (variable value &optional no-save)
   "Set the VARIABLE to VALUE, and return VALUE.
@@ -230,10 +246,16 @@ NEW-SESSION specifies whether to create a new xwidget-webkit session."
       (goto-char (point-min))
       (while (re-search-forward
               (format "^[\t ]*[;]*[\t ]*(setq %s .*)" variable)
-                               nil t)
-  (replace-match (format "(setq %s '%s)" variable value) nil nil))
+              nil t)
+        (replace-match (format "(setq %s '%s)" variable value) nil nil))
       (write-region nil nil custom-file)
       (message "Saved %s (%s) to %s" variable value custom-file))))
+
+(defun too-long-file-p ()
+  "Check whether the file is too long."
+  (if (fboundp 'buffer-line-statistics)
+      (> (car (buffer-line-statistics)) 3000)
+    (> (buffer-size) 100000)))
 
 (define-minor-mode centaur-read-mode
   "Minor Mode for better reading experience."
@@ -297,7 +319,7 @@ Return the fastest package archive."
                (require 'chart nil t)
                (require 'url nil t))
       (chart-bar-quickie
-       'horizontal
+       'vertical
        "Speed test for the ELPA mirrors"
        (mapcar (lambda (p) (symbol-name (car p))) centaur-package-archives-alist)
        "ELPA"
@@ -333,85 +355,20 @@ This issue has been addressed in 28."
     (message "Updating configurations...done")))
 (defalias 'centaur-update-config #'update-config)
 
-(defvar centaur--updating-packages nil)
-(defun update-packages (&optional force sync)
-  "Refresh package contents and update all packages.
-
-If FORCE is non-nil, the updating process will be restarted by force.
-If SYNC is non-nil, the updating process is synchronous."
+(defun update-packages ()
+  "Refresh package contents and update all packages."
   (interactive)
-
-  (if (process-live-p centaur--updating-packages)
-      (when force
-        (kill-process centaur--updating-packages)
-        (setq centaur--updating-packages nil))
-    (setq centaur--updating-packages nil))
-
   (message "Updating packages...")
-  (unless centaur--updating-packages
-    (if (and (not sync)
-             (require 'async nil t))
-        (setq centaur--updating-packages
-              (async-start
-               `(lambda ()
-                  ,(async-inject-variables "\\`\\(load-path\\)\\'")
-                  (require 'init-funcs)
-                  (require 'init-package)
-                  (upgrade-packages)
-                  (with-current-buffer auto-package-update-buffer-name
-                    (buffer-string)))
-               (lambda (result)
-                 (setq centaur--updating-packages nil)
-                 (message "%s" result)
-                 (message "Updating packages...done"))))
-      (upgrade-packages)
-      (message "Updating packages...done"))))
+  (package-update-all)
+  (message "Updating packages...done"))
 (defalias 'centaur-update-packages #'update-packages)
 
-(defvar centaur--updating nil)
-(defun update-config-and-packages(&optional force sync)
-  "Update confgiurations and packages.
-
-If FORCE is non-nil, the updating process will be restarted by force.
-If SYNC is non-nil, the updating process is synchronous."
-  (interactive "P")
-
-  (if (process-live-p centaur--updating)
-      (when force
-        (kill-process centaur--updating)
-        (setq centaur--updating nil))
-    (setq centaur--updating nil))
-
-  (message "Updating Centaur Emacs...")
-  (unless centaur--updating
-    (if (and (not sync)
-             (require 'async nil t))
-        (setq centaur--updating
-              (async-start
-               `(lambda ()
-                  ,(async-inject-variables "\\`\\(load-path\\)\\'")
-                  (require 'init-funcs)
-                  (require 'init-package)
-                  (update-config)
-                  (update-packages nil t)
-                  (with-current-buffer auto-package-update-buffer-name
-                    (buffer-string)))
-               (lambda (result)
-                 (setq centaur--updating nil)
-                 (message "%s" result)
-                 (message "Updating Centaur Emacs...done"))))
-      (update-config)
-      (update-packages nil t)
-      (message "Updating Centaur Emacs...done"))))
-(defalias 'centaur-update #'update-config-and-packages)
-
-(defun update-all()
-  "Update dotfiles, org files, configurations and packages to the latest."
+(defun update-config-and-packages()
+  "Update confgiurations and packages."
   (interactive)
-  (update-org)
-  (update-dotfiles)
-  (update-config-and-packages))
-(defalias 'centaur-update-all #'update-all)
+  (update-config)
+  (update-packages))
+(defalias 'centaur-update #'update-config-and-packages)
 
 (defun update-dotfiles ()
   "Update the dotfiles to the latest version."
@@ -439,6 +396,14 @@ If SYNC is non-nil, the updating process is synchronous."
           (message "Updating org files...done"))
       (message "\"%s\" doesn't exist" dir))))
 (defalias 'centaur-update-org #'update-org)
+
+(defun update-all()
+  "Update dotfiles, org files, configurations and packages to the latest."
+  (interactive)
+  (update-org)
+  (update-dotfiles)
+  (update-config-and-packages))
+(defalias 'centaur-update-all #'update-all)
 
 
 ;; Fonts
@@ -541,20 +506,14 @@ If SYNC is non-nil, the updating process is synchronous."
 
 (defun centaur--load-theme (theme)
   "Disable others and enable new one."
-  (when theme
-    (message "Loading theme `%s'..." theme)
+  (when-let ((theme (centaur--theme-name theme)))
     (mapc #'disable-theme custom-enabled-themes)
-    (load-theme theme t)
-    (message "Loading theme `%s'...done" theme)))
+    (load-theme theme t)))
 
 (defun centaur--load-system-theme (appearance)
   "Load theme, taking current system APPEARANCE into consideration."
   (mapc #'disable-theme custom-enabled-themes)
-  (centaur--load-theme (centaur--theme-name
-                        (pcase appearance
-                          ('light (cdr (assoc 'light centaur-system-themes)))
-                          ('dark (cdr (assoc 'dark centaur-system-themes)))
-                          (_ centaur-theme)))))
+  (centaur--load-theme (alist-get appearance centaur-system-themes)))
 
 (defun centaur-load-random-theme ()
   "Load the random theme."
@@ -573,33 +532,41 @@ If SYNC is non-nil, the updating process is synchronous."
      (ivy-read "Load theme: "
                `(auto
                  random
-                 ,(if (bound-and-true-p ns-system-appearance) 'system "")
+                 system
                  ,@(mapcar #'car centaur-theme-alist))
                :preselect (symbol-name centaur-theme)))))
-  ;; Set option
-  (centaur-set-variable 'centaur-theme theme no-save)
 
   ;; Disable system theme
-  (remove-hook 'ns-system-appearance-change-functions #'centaur--load-system-theme)
+  (when (bound-and-true-p auto-dark-mode)
+    (setq auto-dark--last-dark-mode-state 'unknown)
+    (auto-dark-mode -1))
 
-  (pcase centaur-theme
+  (pcase theme
     ('auto
      ;; Time-switching themes
      (use-package circadian
+       :ensure t
        :functions circadian-setup
        :custom (circadian-themes centaur-auto-themes)
        :init (circadian-setup)))
     ('system
      ;; System-appearance themes
-     (if (bound-and-true-p ns-system-appearance)
-         (progn
-           (centaur--load-system-theme ns-system-appearance)
-           (add-hook 'ns-system-appearance-change-functions #'centaur--load-system-theme))
-       (progn
-         (message "The `system' theme is unavailable on this platform. Using `default' theme...")
-         (centaur--load-theme (centaur--theme-name 'default)))))
-    ('random (centaur-load-random-theme))
-    (_ (centaur--load-theme (centaur--theme-name theme)))))
+     (use-package auto-dark
+       :ensure t
+       :diminish
+       :init
+       (setq auto-dark-light-theme (alist-get 'light centaur-system-themes)
+             auto-dark-dark-theme (alist-get 'dark centaur-system-themes))
+       (when (and sys/macp (not (display-graphic-p)))
+         (setq auto-dark-detection-method 'osascript))
+       (auto-dark-mode 1)))
+    ('random
+     (centaur-load-random-theme))
+    (_
+     (centaur--load-theme theme)))
+
+  ;; Set option
+  (centaur-set-variable 'centaur-theme theme no-save))
 
 
 
@@ -607,12 +574,12 @@ If SYNC is non-nil, the updating process is synchronous."
 (defvar centaur-frame--geometry nil)
 (defun centaur-frame--save-geometry ()
   "Save current frame's geometry."
-  (setq-local centaur-frame--geometry
-              `((left . ,(frame-parameter nil 'left))
-                (top . ,(frame-parameter nil 'top))
-                (width . ,(frame-parameter nil 'width))
-                (height . ,(frame-parameter nil 'height))
-                (fullscreen))))
+  (setq centaur-frame--geometry
+        `((left   . ,(frame-parameter nil 'left))
+          (top    . ,(frame-parameter nil 'top))
+          (width  . ,(frame-parameter nil 'width))
+          (height . ,(frame-parameter nil 'height))
+          (fullscreen))))
 
 (defun centaur-frame--fullscreen-p ()
   "Returns Non-nil if the frame is fullscreen."

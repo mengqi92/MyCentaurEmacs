@@ -120,14 +120,11 @@
         doom-modeline-height 1
         doom-modeline-window-width-limit 110
         doom-modeline-minor-modes t)
-  ;; Prevent flash of unstyled modeline at startup
-  (unless after-init-time
-    (setq-default mode-line-format nil))
   :bind (:map doom-modeline-mode-map
          ("C-<f6>" . doom-modeline-hydra/body))
   :pretty-hydra
   ((:title (pretty-hydra-title "Mode Line" 'fileicon "emacs" :face 'all-the-icons-purple :v-adjust -0.1)
-    :color amaranth :quit-key "q")
+    :color amaranth :quit-key ("q" "C-g"))
    ("Icon"
     (("i" (setq doom-modeline-icon (not doom-modeline-icon))
       "display icons" :toggle doom-modeline-icon)
@@ -173,8 +170,8 @@
      ("g f" (setq doom-modeline-irc-buffers (not doom-modeline-irc-buffers))
       "irc buffers" :toggle doom-modeline-irc-buffers)
      ("g s" (progn
-            (setq doom-modeline-checker-simple-format (not doom-modeline-checker-simple-format))
-            (and (bound-and-true-p flycheck-mode) (flycheck-buffer)))
+              (setq doom-modeline-checker-simple-format (not doom-modeline-checker-simple-format))
+              (and (bound-and-true-p flycheck-mode) (flycheck-buffer)))
       "simple checker" :toggle doom-modeline-checker-simple-format)
      ("g t" (setq doom-modeline-time (not doom-modeline-time))
       "time" :toggle doom-modeline-time)
@@ -256,12 +253,10 @@
 (use-package hide-mode-line
   :hook (((completion-list-mode
            completion-in-region-mode
-           eshell-mode
-           shell-mode
-           term-mode
-           vterm-mode
-           pdf-annot-list-mode
-           flycheck-error-list-mode) . hide-mode-line-mode)))
+           eshell-mode shell-mode
+           term-mode vterm-mode
+           lsp-ui-imenu-mode
+           pdf-annot-list-mode) . hide-mode-line-mode)))
 
 ;; A minor-mode menu for mode-line
 (use-package minions
@@ -301,6 +296,7 @@
              ("\\.\\(bash\\|zsh\\)*_?profile$" all-the-icons-alltheicon "script"   :height 0.9 :face all-the-icons-dred)
              ("\\.\\(ba\\|z\\)sh_history$"     all-the-icons-alltheicon "script"   :height 0.9 :face all-the-icons-dsilver)
              ("\\.zshenv$"                     all-the-icons-alltheicon "script"   :height 0.9 :face all-the-icons-dred)
+             ("\\.org_archive$"                all-the-icons-fileicon "org"        :face all-the-icons-dsilver)
              ("Cask\\'"                        all-the-icons-fileicon "elisp"      :height 1.0 :v-adjust -0.2 :face all-the-icons-blue)
              ("NEWS$"                          all-the-icons-faicon "newspaper-o"  :height 0.9 :v-adjust -0.2)
              ("^Rakefile$"                     all-the-icons-alltheicon "ruby-alt" :face all-the-icons-red))))
@@ -309,9 +305,13 @@
 
     (let ((mode-icon-alist
            '((xwidget-webkit-mode           all-the-icons-faicon "chrome"          :v-adjust -0.1 :face all-the-icons-blue)
-             (bongo-playlist-mode           all-the-icons-material "queue_music"   :height 1.2 :face all-the-icons-green)
+             (bongo-playlist-mode           all-the-icons-material "queue_music"   :height 1.3 :face all-the-icons-green)
              (bongo-library-mode            all-the-icons-material "library_music" :height 1.1 :face all-the-icons-green)
              (simple-mpc-mode               all-the-icons-faicon "music"           :v-adjust -0.1 :face all-the-icons-green)
+             (mingus-playlist-mode          all-the-icons-faicon "music"           :v-adjust -0.1 :face all-the-icons-green)
+             (mingus-help-mode              all-the-icons-material "music_note"    :height 1.2 :face all-the-icons-green)
+             (mingus-browse-mode            all-the-icons-material "library_music" :height 1.1 :face all-the-icons-green)
+             (mingus-burn-mode              all-the-icons-material "queue_music"   :height 1.3 :face all-the-icons-green)
              (gnus-group-mode               all-the-icons-fileicon "gnu"           :face all-the-icons-silver)
              (gnus-summary-mode             all-the-icons-octicon "inbox"          :height 1.0 :v-adjust 0.0 :face all-the-icons-orange)
              (gnus-article-mode             all-the-icons-octicon "mail"           :height 1.1 :v-adjust 0.0 :face all-the-icons-lblue)
@@ -375,6 +375,11 @@
          ("C-s--" . default-text-scale-decrease)
          ("C-s-0" . default-text-scale-reset)))
 
+(use-package time
+  :ensure nil
+  :init (setq display-time-24hr-format t
+              display-time-day-and-date t))
+
 ;; Mouse & Smooth Scroll
 ;; Scroll one line at a time (less "jumpy" than defaults)
 (when (display-graphic-p)
@@ -437,18 +442,12 @@
 ;; Child frame
 (when (childframe-workable-p)
   (use-package posframe
-    :hook ((after-load-theme . posframe-delete-all)
-           ((after-load-theme server-after-make-frame) . my-set-posframe-faces))
+    :hook (after-load-theme . posframe-delete-all)
     :init
     (defface posframe-border
-      `((t (:background ,(face-foreground 'shadow nil t))))
+      `((t (:inherit region)))
       "Face used by the `posframe' border."
       :group 'posframe)
-
-    (defun my-set-posframe-faces ()
-      "Set `posframe' faces."
-      (custom-set-faces
-       `(posframe-border ((t (:background ,(face-foreground 'shadow nil t)))))))
 
     (with-eval-after-load 'persp-mode
       (add-hook 'persp-load-buffer-functions
@@ -524,7 +523,6 @@
         (set-char-table-range composition-ligature-table (car char-regexp)
                               `([,(cdr char-regexp) 0 font-shape-gstring]))))
     (set-char-table-parent composition-ligature-table composition-function-table)))
-
 
 (provide 'init-ui)
 

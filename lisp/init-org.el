@@ -1,4 +1,4 @@
-;; init-org.el --- Initialize org configurations.	-*- lexical-binding: t -*-
+;; init-org.el --- Initialize Org configurations.	-*- lexical-binding: t -*-
 
 ;; Copyright (C) 2006-2022 Vincent Zhang
 
@@ -36,11 +36,11 @@
 
 (use-package org
   :ensure nil
-  :commands (org-dynamic-block-define)
-  :custom-face (org-ellipsis ((t (:foreground nil))))
+  :custom-face (org-ellipsis ((t (:foreground unspecified))))
   :pretty-hydra
+  ;; See `org-structure-template-alist'
   ((:title (pretty-hydra-title "Org Template" 'fileicon "org" :face 'all-the-icons-green :height 1.1 :v-adjust 0.0)
-           :color blue :quit-key "q")
+    :color blue :quit-key ("q" "C-g"))
    ("Basic"
     (("a" (hot-expand "<a") "ascii")
      ("c" (hot-expand "<c") "center")
@@ -63,6 +63,7 @@
      ("m" (hot-expand "<s" "emacs-lisp") "emacs-lisp")
      ("y" (hot-expand "<s" "python :results output") "python")
      ("p" (hot-expand "<s" "perl") "perl")
+     ("w" (hot-expand "<s" "powershell") "powershell")
      ("r" (hot-expand "<s" "ruby") "ruby")
      ("S" (hot-expand "<s" "sh") "sh")
      ("g" (hot-expand "<s" "go :imports '\(\"fmt\"\)") "golang"))
@@ -147,7 +148,7 @@ prepended to the element after the #+HEADER: tag."
                              (?C . success))
 
         ;; Agenda styling
-        org-agenda-files `(,centaur-org-agenda-directory)
+        org-agenda-files (list centaur-org-directory)
         org-agenda-block-separator ?─
         org-agenda-time-grid
         '((daily today require-timed)
@@ -197,9 +198,10 @@ prepended to the element after the #+HEADER: tag."
               (centaur-webkit-browse-url (concat "file://" file) t)))
           org-file-apps))
 
-  ;; Add gfm/md backends
-  (use-package ox-gfm)
+  ;; Add md/gfm backends
   (add-to-list 'org-export-backends 'md)
+  (use-package ox-gfm
+    :init (add-to-list 'org-export-backends 'gfm))
 
   (with-eval-after-load 'counsel
     (bind-key [remap org-set-tags-command] #'counsel-org-tag org-mode-map))
@@ -265,7 +267,7 @@ prepended to the element after the #+HEADER: tag."
   ;; Rich text clipboard
   (use-package org-rich-yank
     :bind (:map org-mode-map
-                ("C-M-y" . org-rich-yank)))
+           ("C-M-y" . org-rich-yank)))
 
   ;; Table of contents
   (use-package toc-org
@@ -274,9 +276,9 @@ prepended to the element after the #+HEADER: tag."
   ;; Export text/html MIME emails
   (use-package org-mime
     :bind (:map message-mode-map
-                ("C-c M-o" . org-mime-htmlize)
-                :map org-mode-map
-                ("C-c M-o" . org-mime-org-buffer-htmlize)))
+           ("C-c M-o" . org-mime-htmlize)
+           :map org-mode-map
+           ("C-c M-o" . org-mime-org-buffer-htmlize)))
 
   ;; Add graphical view of agenda
   (use-package org-timeline
@@ -292,7 +294,7 @@ prepended to the element after the #+HEADER: tag."
     (use-package org-preview-html
       :diminish
       :bind (:map org-mode-map
-                  ("C-c C-h" . org-preview-html-mode))
+             ("C-c C-h" . org-preview-html-mode))
       :init (when (featurep 'xwidget-internal)
               (setq org-preview-html-viewer 'xwidget))))
 
@@ -302,12 +304,12 @@ prepended to the element after the #+HEADER: tag."
     :functions (org-display-inline-images
                 org-remove-inline-images)
     :bind (:map org-mode-map
-                ("s-<f7>" . org-tree-slide-mode)
-                :map org-tree-slide-mode-map
-                ("<left>" . org-tree-slide-move-previous-tree)
-                ("<right>" . org-tree-slide-move-next-tree)
-                ("S-SPC" . org-tree-slide-move-previous-tree)
-                ("SPC" . org-tree-slide-move-next-tree))
+           ("s-<f7>" . org-tree-slide-mode)
+           :map org-tree-slide-mode-map
+           ("<left>" . org-tree-slide-move-previous-tree)
+           ("<right>" . org-tree-slide-move-next-tree)
+           ("S-SPC" . org-tree-slide-move-previous-tree)
+           ("SPC" . org-tree-slide-move-next-tree))
     :hook ((org-tree-slide-play . (lambda ()
                                     (text-scale-increase 4)
                                     (org-display-inline-images)
@@ -332,12 +334,12 @@ prepended to the element after the #+HEADER: tag."
     (org-pomodoro-mode-line-overtime ((t (:inherit error))))
     (org-pomodoro-mode-line-break ((t (:inherit success))))
     :bind (:map org-mode-map
-                ("C-c C-x m" . org-pomodoro))
+           ("C-c C-x m" . org-pomodoro))
     :init
     (with-eval-after-load 'org-agenda
       (bind-keys :map org-agenda-mode-map
-                 ("K" . org-pomodoro)
-                 ("C-c C-x m" . org-pomodoro)))))
+        ("K" . org-pomodoro)
+        ("C-c C-x m" . org-pomodoro)))))
 
 (use-package writeroom-mode)
 
@@ -360,10 +362,14 @@ prepended to the element after the #+HEADER: tag."
     :custom
     (org-roam-complete-everywhere t)
     :init
-    (setq org-roam-directory (expand-file-name "roam" (file-truename centaur-org-directory)))
+    (setq org-roam-directory (expand-file-name "roam" (file-truename centaur-org-directory))
+        org-roam-graph-viewer (if (featurep 'xwidget-internal)
+                                  #'xwidget-webkit-browse-url
+                                #'browse-url))
     :config
     (unless (file-exists-p org-roam-directory)
       (make-directory org-roam-directory))
+    (add-to-list 'org-agenda-files (format "%s/%s" org-roam-directory "roam"))
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
@@ -431,6 +437,7 @@ prepended to the element after the #+HEADER: tag."
         ;; :init
         ;; (when (featurep 'xwidget-internal)
         ;;   (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
+        :bind ("C-c n u" . org-roam-ui-mode)
         :config
         (setq org-roam-ui-sync-theme t
               org-roam-ui-follow t

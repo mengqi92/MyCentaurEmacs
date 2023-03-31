@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'init-const)
+(require 'init-funcs)
 
 ;; Highlight the current line
 (use-package hl-line
@@ -94,8 +95,16 @@ FACE defaults to inheriting from default and highlight."
 ;; Highlight symbols
 (use-package symbol-overlay
   :diminish
-  :functions (turn-off-symbol-overlay turn-on-symbol-overlay)
-  :custom-face (symbol-overlay-default-face ((t (:inherit (region bold)))))
+  :custom-face
+  (symbol-overlay-default-face ((t (:inherit region :background unspecified :foreground unspecified))))
+  (symbol-overlay-face-1 ((t (:inherit all-the-icons-blue :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-2 ((t (:inherit all-the-icons-pink :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-3 ((t (:inherit all-the-icons-yellow :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-4 ((t (:inherit all-the-icons-orange :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-5 ((t (:inherit all-the-icons-red :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-6 ((t (:inherit all-the-icons-purple :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-7 ((t (:inherit all-the-icons-green :background unspecified :foreground unspecified :inverse-video t))))
+  (symbol-overlay-face-8 ((t (:inherit all-the-icons-cyan :background unspecified :foreground unspecified :inverse-video t))))
   :bind (("M-i" . symbol-overlay-put)
          ("M-n" . symbol-overlay-jump-next)
          ("M-p" . symbol-overlay-jump-prev)
@@ -108,24 +117,28 @@ FACE defaults to inheriting from default and highlight."
          (iedit-mode-end        . turn-on-symbol-overlay))
   :init (setq symbol-overlay-idle-time 0.1)
   :config
-  ;; Disable symbol highlighting while selecting
-  (defun turn-off-symbol-overlay (&rest _)
-    "Turn off symbol highlighting."
-    (interactive)
-    (symbol-overlay-mode -1))
-  (advice-add #'set-mark :after #'turn-off-symbol-overlay)
+  (with-no-warnings
+    ;; Disable symbol highlighting while selecting
+    (defun turn-off-symbol-overlay (&rest _)
+      "Turn off symbol highlighting."
+      (interactive)
+      (symbol-overlay-mode -1))
+    (advice-add #'set-mark :after #'turn-off-symbol-overlay)
 
-  (defun turn-on-symbol-overlay (&rest _)
-    "Turn on symbol highlighting."
-    (interactive)
-    (when (derived-mode-p 'prog-mode 'yaml-mode)
-      (symbol-overlay-mode 1)))
-  (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay))
+    (defun turn-on-symbol-overlay (&rest _)
+      "Turn on symbol highlighting."
+      (interactive)
+      (when (derived-mode-p 'prog-mode 'yaml-mode)
+        (symbol-overlay-mode 1)))
+    (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)))
 
 ;; Highlight indentions
 (use-package highlight-indent-guides
   :diminish
-  :hook ((prog-mode yaml-mode) . highlight-indent-guides-mode)
+  :hook ((prog-mode yaml-mode) . (lambda ()
+                                   "Highlight indentations in small files for better performance."
+                                   (unless (too-long-file-p)
+                                     (highlight-indent-guides-mode 1))))
   :init (setq highlight-indent-guides-method 'character
               highlight-indent-guides-responsive 'top
               highlight-indent-guides-suppress-auto-error t)
@@ -220,11 +233,15 @@ FACE defaults to inheriting from default and highlight."
 
 ;; Highlight uncommitted changes using VC
 (use-package diff-hl
+  :custom-face
+  (diff-hl-change ((t (:inherit custom-changed :foreground unspecified :background unspecified))))
+  (diff-hl-insert ((t (:inherit diff-added :background unspecified))))
+  (diff-hl-delete ((t (:inherit diff-removed :background unspecified))))
   :bind (:map diff-hl-command-map
          ("SPC" . diff-hl-mark-hunk))
   :hook ((after-init . global-diff-hl-mode)
-         (dired-mode . diff-hl-dired-mode)
-         ((after-init after-load-theme server-after-make-frame) . my-set-diff-hl-faces))
+         (after-init . global-diff-hl-show-hunk-mouse-mode)
+         (dired-mode . diff-hl-dired-mode))
   :init (setq diff-hl-draw-borders nil)
   :config
   ;; Highlight on-the-fly
@@ -233,18 +250,11 @@ FACE defaults to inheriting from default and highlight."
   ;; Set fringe style
   (setq-default fringes-outside-margins t)
 
-  (defun my-set-diff-hl-faces ()
-    "Set `diff-hl' faces."
-    (custom-set-faces
-     `(diff-hl-change ((t (:foreground ,(face-foreground 'custom-changed) :background nil))))
-     '(diff-hl-insert ((t (:inherit diff-added :background nil))))
-     '(diff-hl-delete ((t (:inherit diff-removed :background nil))))))
-
   (with-no-warnings
     (defun my-diff-hl-fringe-bmp-function (_type _pos)
       "Fringe bitmap function for use as `diff-hl-fringe-bmp-function'."
       (define-fringe-bitmap 'my-diff-hl-bmp
-        (vector (if sys/macp #b11100000 #b11111100))
+        (vector (if sys/linuxp #b11111100 #b11100000))
         1 8
         '(center t)))
     (setq diff-hl-fringe-bmp-function #'my-diff-hl-fringe-bmp-function)
@@ -262,24 +272,12 @@ FACE defaults to inheriting from default and highlight."
       (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
       (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))))
 
-;; Highlight some operations
-(use-package volatile-highlights
-  :diminish
-  :hook (after-init . volatile-highlights-mode)
-  :config
-  (with-no-warnings
-    (when (fboundp 'pulse-momentary-highlight-region)
-      (defun my-vhl-pulse (beg end &optional _buf face)
-        "Pulse the changes."
-        (pulse-momentary-highlight-region beg end face))
-      (advice-add #'vhl/.make-hl :override #'my-vhl-pulse))))
-
 ;; Pulse current line
 (use-package pulse
   :ensure nil
   :custom-face
-  (pulse-highlight-start-face ((t (:inherit region))))
-  (pulse-highlight-face ((t (:inherit region :extend t))))
+  (pulse-highlight-start-face ((t (:inherit region :background unspecified))))
+  (pulse-highlight-face ((t (:inherit region :background unspecified :extend t))))
   :hook (((dumb-jump-after-jump imenu-after-jump) . my-recenter-and-pulse)
          ((bookmark-after-jump magit-diff-visit-file next-error) . my-recenter-and-pulse-line))
   :init
@@ -305,8 +303,9 @@ FACE defaults to inheriting from default and highlight."
       (my-pulse-momentary-line))
 
     (dolist (cmd '(recenter-top-bottom
-                   other-window windmove-do-window-select
-                   ace-window aw--select-window
+                   other-window switch-to-buffer
+                   aw-select toggle-window-split
+                   windmove-do-window-select
                    pager-page-down pager-page-up
                    treemacs-select-window
                    symbol-overlay-basic-jump))
@@ -316,6 +315,15 @@ FACE defaults to inheriting from default and highlight."
                    pop-global-mark
                    goto-last-change))
       (advice-add cmd :after #'my-recenter-and-pulse))))
+
+;; Pulse modified region
+(if emacs/>=27p
+    (use-package goggles
+      :diminish
+      :hook ((prog-mode text-mode) . goggles-mode))
+  (use-package volatile-highlights
+    :diminish
+    :hook (after-init . volatile-highlights-mode)))
 
 (provide 'init-highlight)
 
