@@ -37,13 +37,11 @@
 (use-package treemacs
   :commands (treemacs-follow-mode
              treemacs-filewatch-mode
-             treemacs-fringe-indicator-mode
              treemacs-git-mode)
   :custom-face
-  (cfrs-border-color ((t (:background ,(face-foreground 'font-lock-comment-face nil t)))))
+  (cfrs-border-color ((t (:inherit posframe-border))))
   :bind (([f8]        . treemacs)
          ("M-0"       . treemacs-select-window)
-         ("C-x 1"     . treemacs-delete-other-windows)
          ("C-x t 1"   . treemacs-delete-other-windows)
          ("C-x t t"   . treemacs)
          ("C-x t b"   . treemacs-bookmark)
@@ -75,7 +73,7 @@
 
   (use-package treemacs-magit
     :after magit
-    :commands treemacs-magit--schedule-update
+    :autoload treemacs-magit--schedule-update
     :hook ((magit-post-commit
             git-commit-post-finish
             magit-post-stage

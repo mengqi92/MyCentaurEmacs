@@ -32,71 +32,90 @@
 
 (require 'init-custom)
 
-;; Webkit browser
-;; (use-package xwidget
-;;   :ensure nil
-;;   :if (featurep 'xwidget-internal)
-;;   :bind (("C-c C-z w" . xwidget-webkit-browse-url)
-;;          :map xwidget-webkit-mode-map
-;;          ("h"         . xwidget-hydra/body))
-;;   :pretty-hydra
-;;   ((:title (pretty-hydra-title "Webkit" 'faicon "chrome" :face 'all-the-icons-blue)
-;;     :color amaranth :quit-key "q")
-;;    ("Navigate"
-;;     (("b" xwidget-webkit-back "back")
-;;      ("f" xwidget-webkit-forward "forward")
-;;      ("r" xwidget-webkit-reload "refresh")
-;;      ("SPC" xwidget-webkit-scroll-up "scroll up")
-;;      ("DEL" xwidget-webkit-scroll-down "scroll down")
-;;      ("S-SPC" xwidget-webkit-scroll-down "scroll down"))
-;;     "Zoom"
-;;     (("+" xwidget-webkit-zoom-in "zoom in")
-;;      ("=" xwidget-webkit-zoom-in "zoom in")
-;;      ("-" xwidget-webkit-zoom-out "zoom out"))
-;;     "Misc"
-;;     (("g" xwidget-webkit-browse-url "browse url" :exit t)
-;;      ("u" xwidget-webkit-current-url "show url" :exit t)
-;;      ("v" xwwp-follow-link "follow link" :exit t)
-;;      ("w" xwidget-webkit-current-url-message-kill "copy url" :exit t)
-;;      ("?" describe-mode "help" :exit t)
-;;      ("Q" quit-window "quit" :exit t))))
-;;   :init
-;;   ;; Link navigation
-;;   (use-package xwwp-follow-link-ivy
-;;     :after ivy
-;;     :bind (("C-c C-z x" . xwwp)
-;;            :map xwidget-webkit-mode-map
-;;            ("v"         . xwwp-follow-link))
-;;     :init (setq xwwp-follow-link-completion-system 'ivy)))
+;; eww
+(use-package eww
+  :ensure nil
+  :init
+  ;; Install: npm install -g readability-cli
+  (when (executable-find "readable")
+    (setq eww-retrieve-command '("readable"))))
 
-;; CSS mode
+;; Webkit browser
+(use-package xwidget
+  :ensure nil
+  :if (featurep 'xwidget-internal)
+  :bind (("C-c C-z w" . xwidget-webkit-browse-url)
+         :map xwidget-webkit-mode-map
+         ("h"         . xwidget-hydra/body))
+  :pretty-hydra
+  ((:title (pretty-hydra-title "Webkit" 'faicon "chrome" :face 'all-the-icons-blue)
+    :color amaranth :quit-key ("q" "C-g"))
+   ("Navigate"
+    (("b" xwidget-webkit-back "back")
+     ("f" xwidget-webkit-forward "forward")
+     ("r" xwidget-webkit-reload "refresh")
+     ("SPC" xwidget-webkit-scroll-up "scroll up")
+     ("DEL" xwidget-webkit-scroll-down "scroll down")
+     ("S-SPC" xwidget-webkit-scroll-down "scroll down"))
+    "Zoom"
+    (("+" xwidget-webkit-zoom-in "zoom in")
+     ("=" xwidget-webkit-zoom-in "zoom in")
+     ("-" xwidget-webkit-zoom-out "zoom out"))
+    "Misc"
+    (("g" xwidget-webkit-browse-url "browse url" :exit t)
+     ("u" xwidget-webkit-current-url "show url" :exit t)
+     ("v" xwwp-follow-link "follow link" :exit t)
+     ("w" xwidget-webkit-current-url-message-kill "copy url" :exit t)
+     ("?" describe-mode "help" :exit t)
+     ("Q" quit-window "quit" :exit t))))
+  :init
+  ;; Link navigation
+  (use-package xwwp-follow-link-ivy
+    :after ivy
+    :bind (("C-c C-z x" . xwwp)
+           :map xwidget-webkit-mode-map
+           ("v"         . xwwp-follow-link))
+    :init (setq xwwp-follow-link-completion-system 'ivy)))
+
+;; CSS
 (use-package css-mode
   :ensure nil
   :init (setq css-indent-offset 2))
 
-;; SCSS mode
+;; SCSS
 (use-package scss-mode
   :init
   ;; Disable complilation on save
   (setq scss-compile-at-save nil))
 
-;; New `less-css-mde' in Emacs 26
+;; LESS
 (unless (fboundp 'less-css-mode)
   (use-package less-css-mode))
 
-;; JSON mode
-(use-package json-mode)
+;; JSON
+(unless (fboundp 'js-json-mode)
+  (use-package json-mode))
 
 ;; JavaScript
+(use-package js-mode
+  :ensure nil
+  :defines (js-indent-level flycheck-javascript-eslint-executable)
+  :config
+  (setq js-indent-level 2)
+
+  (with-eval-after-load 'flycheck
+    ;; https://github.com/mantoni/eslint_d.js
+    ;; Install: npm -i -g eslint_d
+    (when (executable-find "eslint_d")
+      (setq flycheck-javascript-eslint-executable "eslint_d"))))
+
 (use-package js2-mode
-  :defines flycheck-javascript-eslint-executable
   :mode (("\\.js\\'" . js2-mode)
          ("\\.jsx\\'" . js2-jsx-mode))
   :interpreter (("node" . js2-mode)
                 ("node" . js2-jsx-mode))
   :hook ((js2-mode . js2-imenu-extras-mode)
          (js2-mode . js2-highlight-unused-variables-mode))
-  :init (setq js-indent-level 2)
   :config
   ;; Use default keybindings for lsp
   (when centaur-lsp
@@ -106,24 +125,15 @@
     (when (or (executable-find "eslint_d")
               (executable-find "eslint")
               (executable-find "jshint"))
-      (setq js2-mode-show-strict-warnings nil))
-    (when (executable-find "eslint_d")
-      ;; https://github.com/mantoni/eslint_d.js
-      ;; Install: npm -i -g eslint_d
-      (setq flycheck-javascript-eslint-executable "eslint_d")))
-
-  (use-package js2-refactor
-    :diminish
-    :hook (js2-mode . js2-refactor-mode)
-    :config (js2r-add-keybindings-with-prefix "C-c C-m")))
+      (setq js2-mode-show-strict-warnings nil))))
 
 ;; Format HTML, CSS and JavaScript/JSON
 ;; Install: npm -g install prettier
-(use-package prettier-js
-  :diminish
-  :hook ((js-mode js2-mode json-mode web-mode css-mode sgml-mode html-mode)
-         .
-         prettier-js-mode))
+(when (executable-find "prettier")
+  (use-package prettier
+    :diminish
+    :hook ((js-mode js2-mode css-mode sgml-mode web-mode) . prettier-mode)
+    :init (setq prettier-pre-warm 'none)))
 
 ;; Live browser JavaScript, CSS, and HTML interaction
 (use-package skewer-mode

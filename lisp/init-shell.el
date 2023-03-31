@@ -110,7 +110,7 @@
 ;; @see https://github.com/akermu/emacs-libvterm#installation
 (when (and module-file-suffix           ; dynamic module
            (executable-find "cmake")
-           (executable-find "libtool")
+           (executable-find "libtool")  ; libtool-bin
            (executable-find "make"))
   (use-package vterm
     :bind (:map vterm-mode-map
@@ -122,9 +122,10 @@
 
   (use-package multi-vterm
     :bind ("C-<f9>" . multi-vterm)
-    :init (setq multi-vterm-buffer-name "vterm")
+    :custom (multi-vterm-buffer-name "vterm")
     :config
     (with-no-warnings
+      ;; Use `pop-to-buffer' instead of `switch-to-buffer'
       (defun my-multi-vterm ()
         "Create new vterm buffer."
         (interactive)
@@ -134,7 +135,34 @@
           (set-buffer vterm-buffer)
           (multi-vterm-internal)
           (pop-to-buffer vterm-buffer)))
-      (advice-add #'multi-vterm :override #'my-multi-vterm))))
+      (advice-add #'multi-vterm :override #'my-multi-vterm)
+
+      ;; FIXME: `project-root' is introduced in 27+.
+      (defun my-multi-vterm-project-root ()
+        "Get `default-directory' for project using projectile or project.el."
+        (unless (boundp 'multi-vterm-projectile-installed-p)
+          (setq multi-vterm-projectile-installed-p (require 'projectile nil t)))
+        (if multi-vterm-projectile-installed-p
+            (projectile-project-root)
+          (let ((project (or (project-current) `(transient . ,default-directory))))
+            (if (fboundp 'project-root)
+                (project-root project)
+              (cdr project)))))
+      (advice-add #'multi-vterm-project-root :override #'my-multi-vterm-project-root))))
+
+;; Powershell
+(use-package powershell
+  :init
+  (defun powershell (&optional buffer)
+    "Launches a powershell in buffer *powershell* and switches to it."
+    (interactive)
+    (let ((buffer (or buffer "*powershell*"))
+          (program (if (executable-find "pwsh") "pwsh"
+                     "powershell")))
+      (make-comint-in-buffer "Powershell" buffer program nil "-NoProfile")
+      (with-current-buffer buffer
+        (setq-local mode-line-format nil))
+      (pop-to-buffer buffer))))
 
 ;; Shell Pop: leverage `popper'
 (with-no-warnings
@@ -144,6 +172,8 @@
   (defun shell-pop--shell (&optional arg)
     "Run shell and return the buffer."
     (cond ((fboundp 'vterm) (vterm arg))
+          ((or (executable-find "pwsh") (executable-find "powershell"))
+           (powershell arg))
           (sys/win32p (eshell arg))
           (t (shell))))
 
@@ -172,14 +202,11 @@
   (when (childframe-workable-p)
     (defun shell-pop-posframe-hidehandler (_)
       "Hidehandler used by `shell-pop-posframe-toggle'."
-      (not (eq (selected-frame) posframe--frame)))
+      (not (eq (selected-frame) shell-pop--frame)))
 
     (defun shell-pop-posframe-toggle ()
       "Toggle shell in child frame."
       (interactive)
-      (unless (childframe-workable-p)
-        (user-error "Child frame is not supported!"))
-
       (let* ((buffer (shell-pop--shell))
              (window (get-buffer-window buffer)))
         ;; Hide window: for `popper'

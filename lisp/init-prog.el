@@ -32,6 +32,7 @@
 
 (require 'init-custom)
 (require 'init-const)
+(require 'init-funcs)
 
 ;; Prettify Symbols
 ;; e.g. display “lambda” as “λ”
@@ -42,18 +43,16 @@
   (setq-default prettify-symbols-alist centaur-prettify-symbols-alist)
   (setq prettify-symbols-unprettify-at-point 'right-edge))
 
-;; Tree-sitter: need dynamic module feature
-(when (and centaur-tree-sitter (functionp 'module-load))
-  (use-package tree-sitter
-    :ensure tree-sitter-langs
-    :diminish
-    :hook ((after-init . global-tree-sitter-mode)
-           (tree-sitter-after-on . tree-sitter-hl-mode))))
+;; Tree-sitter support
+(when (and centaur-tree-sitter (centaur-treesit-available-p))
+  (use-package treesit-auto
+    :hook (after-init . global-treesit-auto-mode)
+    :init (setq treesit-auto-install 'prompt)))
 
 ;; Search tool
 (use-package grep
   :ensure nil
-  :commands grep-apply-setting
+  :autoload grep-apply-setting
   :config
   (cond
    ((executable-find "ugrep")
@@ -105,7 +104,7 @@
 (use-package dumb-jump
   :pretty-hydra
   ((:title (pretty-hydra-title "Dump Jump" 'faicon "anchor")
-    :color blue :quit-key "q")
+    :color blue :quit-key ("q" "C-g"))
    ("Jump"
     (("j" dumb-jump-go "Go")
      ("o" dumb-jump-go-other-window "Go other window")
@@ -139,7 +138,7 @@
 ;; Browse devdocs.io documents using EWW
 (when emacs/>=27p
   (use-package devdocs
-    :commands (devdocs--installed-docs devdocs--available-docs)
+    :autoload (devdocs--installed-docs devdocs--available-docs)
     :bind (:map prog-mode-map
            ("M-<f1>" . devdocs-dwim)
            ("C-h D"  . devdocs-dwim))
@@ -194,9 +193,12 @@ Install the doc if it's not installed."
 (when emacs/>=27p
   (use-package csv-mode))
 
+(unless emacs/>=29p
+  (use-package csharp-mode))
+
 (use-package cask-mode)
 (use-package cmake-mode)
-(use-package csharp-mode)
+(use-package groovy-mode)
 (use-package julia-mode)
 (use-package lua-mode)
 (use-package mermaid-mode)
@@ -216,10 +218,6 @@ Install the doc if it's not installed."
 (use-package nxml-mode
   :ensure nil
   :mode (("\\.xaml$" . xml-mode)))
-
-;; New `conf-toml-mode' in Emacs 26
-(unless (fboundp 'conf-toml-mode)
-  (use-package toml-mode))
 
 ;; Batch Mode eXtras
 (use-package bmx-mode

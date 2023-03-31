@@ -53,34 +53,43 @@
 (when (version< emacs-version "26.1")
   (error "This requires Emacs 26.1 and above!"))
 
+;;
 ;; Speed up startup
+;;
+
+;; Defer garbage collection further back in the startup process
+(setq gc-cons-threshold most-positive-fixnum)
+
+;; Prevent flashing of unstyled modeline at startup
+(setq-default mode-line-format nil)
+
+;; Don't pass case-insensitive to `auto-mode-alist'
 (setq auto-mode-case-fold nil)
 
 (unless (or (daemonp) noninteractive init-file-debug)
-  (let ((old-file-name-handler-alist file-name-handler-alist))
+  ;; Prevent flashing of messages at startup
+  (when (display-graphic-p)
+    (setq-default inhibit-redisplay t
+                  inhibit-message t)
+    (defun reset-inhibit-vars ()
+      (setq-default inhibit-redisplay nil
+                    inhibit-message nil)
+      (redraw-frame))
+    (add-hook 'window-setup-hook #'reset-inhibit-vars)
+    (define-advice startup--load-user-init-file (:after (&rest _) reset-inhibit-vars)
+      (and init-file-had-error (reset-inhibit-vars))))
+
+  ;; Suppress file handlers operations at startup
+  ;; `file-name-handler-alist' is consulted on each call to `require' and `load'
+  (let ((old-value file-name-handler-alist))
     (setq file-name-handler-alist nil)
+    (set-default-toplevel-value 'file-name-handler-alist file-name-handler-alist)
     (add-hook 'emacs-startup-hook
               (lambda ()
                 "Recover file name handlers."
                 (setq file-name-handler-alist
-                      (delete-dups (append file-name-handler-alist
-                                           old-file-name-handler-alist)))))))
-
-;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold most-positive-fixnum)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            "Recover GC values after startup."
-            (setq gc-cons-threshold 800000)))
-
-;; Suppress flashing at startup
-(setq-default inhibit-redisplay t
-              inhibit-message t)
-(add-hook 'window-setup-hook
-          (lambda ()
-            (setq-default inhibit-redisplay nil
-                          inhibit-message nil)
-            (redisplay)))
+                      (delete-dups (append file-name-handler-alist old-value))))
+              101)))
 
 ;; Load path
 ;; Optimize: Force "lisp"" and "site-lisp" at the head to reduce the startup time.
@@ -107,7 +116,7 @@ Otherwise the startup will be very slow. "
 (require 'init-package)
 
 ;; Preferences
-(require 'init-basic)
+(require 'init-base)
 (require 'init-hydra)
 
 (require 'init-ui)
@@ -138,6 +147,7 @@ Otherwise the startup will be very slow. "
 
 (require 'init-dict)
 (require 'init-docker)
+(require 'init-player)
 (require 'init-utils)
 (require 'init-finance)
 

@@ -50,7 +50,7 @@
                    files (append files (list file)))
              nil t)
             (with-bongo-library-buffer
-              (mapc 'bongo-insert-file files)))
+             (mapc 'bongo-insert-file files)))
           (bongo-switch-buffers))
         (bind-key "b" #'bongo-add-dired-files dired-mode-map))))
 
@@ -60,70 +60,132 @@
   ;; Built-in mpc client
   (use-package mpc
     :ensure nil
-    :bind ("s-<f8>" . mpc)
+    :bind ("S-<f8>" . mpc)
     :init
     (defun restart-mpd ()
       (interactive)
       (call-process "pkill" nil nil nil "mpd")
       (call-process "mpd")))
 
+  ;; MPD Interface
+  (use-package mingus
+    :bind ("M-<f8>" . mingus))
+
   ;; Simple mpd client
   (when (executable-find "mpc")
     (use-package simple-mpc
-      :commands (simple-mpc-call-mpc simple-mpc-call-mpc-strings)
-      :functions (simple-mpc-current simple-mpc-start-timer)
-      :bind (("M-<f8>" . simple-mpc)
+      :custom-face
+      (simple-mpc-main-name ((t (:inherit font-lock-string-face :bold t :height 1.3))))
+      (simple-mpc-main-headers ((t (:inherit font-lock-keyword-face :bold t :height 1.1))))
+      (simple-mpc-current-track-face ((t (:inherit font-lock-keyword-face))))
+      :bind (("s-<f8>" . simple-mpc+)
              :map simple-mpc-mode-map
              ("P" . simple-mpc-play)
-             ("O" . simple-mpc-stop))
+             ("O" . simple-mpc-stop)
+             ("u" . simple-mpc-update))
       :init (setq simple-mpc-playlist-format
-                  "%time%\t[[%title%\t%artist%\t%album%]|[%file%]]"
-                  simple-mpc-table-separator "\t")
+                  "[%time% ][[%title%[ - %artist%[ (%album%)]]]|[%file%]]")
       :config
-      (defun simple-mpc-play ()
-        "Start playing the song."
-        (interactive)
-        (simple-mpc-call-mpc nil "play"))
+      (with-no-warnings
+        (defun simple-mpc-play ()
+          "Start playing the song."
+          (interactive)
+          (simple-mpc-call-mpc nil "play"))
 
-      (defun simple-mpc-stop ()
-        "Stop the playback."
-        (interactive)
-        (simple-mpc-call-mpc nil "stop"))
+        (defun simple-mpc-stop ()
+          "Stop the playback."
+          (interactive)
+          (simple-mpc-call-mpc nil "stop"))
 
-      ;; Display current song in mode-line
-      (defvar simple-mpc-current nil)
-      (add-to-list 'global-mode-string '("" (:eval simple-mpc-current)))
+        (defun simple-mpc-update ()
+          "Update database."
+          (interactive)
+          (message "Updating music DB...")
+          (simple-mpc-call-mpc nil "update")
+          (message "Updating music DB...done"))
 
-      (defun simple-mpc-current ()
-        "Get current song information."
-        (setq simple-mpc-current
-              (when (derived-mode-p 'simple-mpc-mode)
-                (let ((strs (simple-mpc-call-mpc-strings nil)))
-                  (when (length> strs 2)
-                    (when-let* ((title (nth 0 strs))
-                                (info (nth 1 strs))
-                                (info-strs (split-string info))
-                                (state (nth 0 info-strs))
-                                (time (nth 2 info-strs)))
-                      (propertize (format " %s%s [%s] "
-                                          (when (icon-displayable-p)
-                                            (pcase state
-                                              ("[playing]" " ")
-                                              ("[paused]" " ")
-                                              (_ "")))
-                                          title time)
-                                  'face 'font-lock-comment-face))))))
-        (force-mode-line-update))
+        ;; Enhance UI
+        (defun simple-mpc+ (&optional _ignore-auto _noconfirm)
+          "Start simple-mpc.
 
-      (defvar simple-mpc--timer nil)
-      (defun simple-mpc-start-timer ()
-        "Start simple-mpc timer to refresh current song."
-        (setq simple-mpc--timer (run-with-timer 1 1 #'simple-mpc-current)))
-      (defun simple-mpc-stop-timer ()
-        "Stop simple-mpc timer."
-        (when (timerp simple-mpc--timer)
-          (cancel-timer simple-mpc--timer)))
-      (simple-mpc-start-timer))))
+IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
+          (interactive)
+          (let ((buf (get-buffer-create simple-mpc-main-buffer-name)))
+            (with-current-buffer buf
+              (read-only-mode -1)
+              (erase-buffer)
+              (insert (propertize "🔊 Simple MPC\n"
+                                  'face 'simple-mpc-main-name)
+
+                      (propertize "\n  ⚙ Controls\n" 'face 'simple-mpc-main-headers)
+                      "\t [t]oggle\n"
+                      "\t [n]ext track\n"
+                      "\t [p]revious track\n"
+                      "\t seek [f]orward\n"
+                      "\t seek [b]ackward\n"
+                      "\t increase [V]olume\n"
+                      "\t decrease [v]olume\n"
+                      "\t toggle [r]epeat mode\n"
+
+                      (propertize "\n  🔈 Playlist\n" 'face 'simple-mpc-main-headers)
+                      "\t Start [P]laying\n"
+                      "\t St[O]p playing\n"
+                      "\t view [c]urrent playlist\n"
+                      "\t [C]lear current playlist\n"
+                      "\t [S]huffle playlist\n"
+                      "\t [l]oad playlist\n"
+                      "\t [u]pdate database\n"
+                      "\t [s]earch database\n"
+
+                      (propertize "\n 🛠 Misc\n" 'face 'simple-mpc-main-headers)
+                      "\t [q]uit")
+              (simple-mpc-mode) ; start major mode
+              (switch-to-buffer buf))))
+
+        (define-advice simple-mpc-format-as-table (:around (fn &rest args) plus)
+          "Prettify playlist."
+          (propertize (apply fn args) 'face 'font-lock-constant-face))
+
+        ;; Display current song in mode-line
+        (defvar simple-mpc-current nil)
+        (add-to-list 'global-mode-string '("" (:eval simple-mpc-current)))
+
+        (defun simple-mpc-current ()
+          "Get current song information."
+          (setq simple-mpc-current
+                (when (derived-mode-p 'simple-mpc-mode)
+                  (let ((strs (simple-mpc-call-mpc-strings nil)))
+                    (when (length> strs 2)
+                      (when-let* ((title (nth 0 strs))
+                                  (info (nth 1 strs))
+                                  (info-strs (split-string info))
+                                  (state (nth 0 info-strs))
+                                  (time (nth 2 info-strs)))
+                        (concat
+                         (when (icon-displayable-p)
+                           (pcase state
+                             ("[playing]"
+                              (concat
+                               " "
+                               (all-the-icons-material "play_circle_outline" :height 0.9 :v-adjust -0.15 :face font-lock-comment-face)))
+                             ("[paused]"
+                              (concat
+                               " "
+                               (all-the-icons-material "pause_circle_outline" :height 0.9 :v-adjust -0.15 :face font-lock-comment-face)))
+                             (_ "")))
+                         (propertize (format " %s [%s] " title time)
+                                     'face '(:inherit 'font-lock-comment-face :height 0.9))))))))
+          (force-mode-line-update))
+
+        (defvar simple-mpc--timer nil)
+        (defun simple-mpc-start-timer ()
+          "Start simple-mpc timer to refresh current song."
+          (setq simple-mpc--timer (run-with-timer 1 1 #'simple-mpc-current)))
+        (defun simple-mpc-stop-timer ()
+          "Stop simple-mpc timer."
+          (when (timerp simple-mpc--timer)
+            (cancel-timer simple-mpc--timer)))
+        (simple-mpc-start-timer)))))
 
 (provide 'init-player)
 

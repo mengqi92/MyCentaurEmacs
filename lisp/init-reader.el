@@ -51,7 +51,16 @@
     :init (setq pdf-view-use-scaling t
                 pdf-view-use-imagemagick nil
                 pdf-annot-activate-created-annotations t)
-    :config (pdf-tools-install t nil t nil)))
+    :config
+    ;; Activate the package
+    (pdf-tools-install t nil t nil)
+
+    ;; Recover last viewed position
+    (use-package saveplace-pdf-view
+      :autoload (saveplace-pdf-view-find-file-advice saveplace-pdf-view-to-alist-advice)
+      :init
+      (advice-add 'save-place-find-file-hook :around #'saveplace-pdf-view-find-file-advice)
+      (advice-add 'save-place-to-alist :around #'saveplace-pdf-view-to-alist-advice))))
 
 ;; Epub reader
 (use-package nov
@@ -86,7 +95,7 @@
 (use-package elfeed
   :pretty-hydra
   ((:title (pretty-hydra-title "Elfeed" 'faicon "rss-square" :face 'all-the-icons-orange :height 1.1 :v-adjust -0.05)
-    :color amaranth :quit-key "q")
+    :color amaranth :quit-key ("q" "C-g"))
    ("Search"
     (("c" elfeed-db-compact "compact db")
      ("g" elfeed-search-update--force "refresh")

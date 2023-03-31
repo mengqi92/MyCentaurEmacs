@@ -11,14 +11,15 @@
 ;; (setq centaur-socks-proxy "127.0.0.1:7890")    ; SOCKS proxy
 ;; (setq centaur-server nil)                      ; Enable `server-mode' or not: t or nil
 ;; (setq centaur-icon nil)                        ; Display icons or not: t or nil
-;; (setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, netease, ustc, tencent or tuna
+;; (setq centaur-package-archives 'melpa)         ; Package repo: melpa, emacs-cn, bfsu, netease, sjtu, tencent, tuna or ustc
 ;; (setq centaur-theme 'auto)                     ; Color theme: auto, random, system, default, pro, dark, light, warm, cold, day or night
 ;; (setq centaur-completion-style 'minibuffer)    ; Completion display style: minibuffer or childframe
 ;; (setq centaur-dashboard nil)                   ; Display dashboard at startup or not: t or nil
 ;; (setq centaur-restore-frame-geometry nil)      ; Restore the frame's geometry at startup: t or nil
 ;; (setq centaur-lsp 'eglot)                      ; Set LSP client: lsp-mode, eglot or nil
+;; (setq centaur-lsp-format-on-save t)            ; Auto format buffers on save: t or nil
 ;; (setq centaur-lsp-format-on-save-ignore-modes '(c-mode c++-mode python-mode markdown-mode)) ; Ignore format on save for some languages
-;; (setq centaur-tree-sitter t)                   ; Enable `tree-sitter' or not: t or nil
+;; (setq centaur-tree-sitter nil)                 ; Enable tree-sitter or not: t or nil. Only available in 29+.
 ;; (setq centaur-chinese-calendar t)              ; Support Chinese calendar or not: t or nil
 ;; (setq centaur-player t)                        ; Enable players or not: t or nil
 ;; (setq centaur-prettify-symbols-alist nil)      ; Alist of symbol prettifications. Nil to use font supports ligatures.
@@ -56,19 +57,27 @@
     ;; Specify font for all unicode characters
     (cl-loop for font in '("Segoe UI Symbol" "Symbola" "Symbol")
              when (font-installed-p font)
-             return (set-fontset-font t 'unicode font nil 'prepend))
-
-    ;; Emoji
-    (cl-loop for font in '("Noto Color Emoji" "Apple Color Emoji")
-             when (font-installed-p font)
-             return (if (>= emacs-major-version 28)
-                        (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend)
+             return (if (< emacs-major-version 27)
+                        (set-fontset-font "fontset-default" 'unicode font nil 'prepend)
                       (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend)))
 
-    ;; Specify font for Chinese characters
-    (cl-loop for font in '("WenQuanYi Micro Hei" "Microsoft Yahei")
+    ;; Emoji
+    (cl-loop for font in '("Noto Color Emoji" "Apple Color Emoji" "Segoe UI Emoji")
              when (font-installed-p font)
-             return (set-fontset-font t '(#x4e00 . #x9fff) font))))
+             return (cond
+                     ((< emacs-major-version 27)
+                      (set-fontset-font "fontset-default" 'unicode font nil 'prepend))
+                     ((< emacs-major-version 28)
+                      (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
+                     (t
+                      (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))))
+
+    ;; Specify font for Chinese characters
+    (cl-loop for font in '("WenQuanYi Micro Hei" "PingFang SC" "Microsoft Yahei" "STFangsong")
+             when (font-installed-p font)
+             return (progn
+                      (setq face-font-rescale-alist `((,font . 1.3)))
+                      (set-fontset-font t '(#x4e00 . #x9fff) (font-spec :family font))))))
 
 (centaur-setup-fonts)
 (add-hook 'window-setup-hook #'centaur-setup-fonts)
