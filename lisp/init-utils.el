@@ -342,9 +342,10 @@ of the buffer text to be displayed in the popup"
 (defconst on-windows (string-equal system-type "windows-nt"))
 (defconst on-mac (string-equal system-type "darwin"))
 
-(defconst on-macbook (on-host "TODO.local"))
+(defconst on-macbook (or (on-host "MengqiMBP") (on-host "BigMac")))
 (defconst on-home-linux-desktop (and on-linux (on-host "fedora-silver")))
 (defconst on-home-windows-desktop-wsl (and on-linux (on-host "TODO")))
+
 
 (provide 'init-utils)
 

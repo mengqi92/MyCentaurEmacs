@@ -64,6 +64,7 @@
   (setq rime-user-data-dir "~/emacs-rime/")
   (setq rime-share-data-dir "/usr/share/rime-data")
   (when on-macbook (setq rime-librime-root "~/.emacs.d/librime/dist"))
+
   ;; 断言成立时关闭输入法
   ;; (setq rime-disable-predicates t)
   ;; 断言成立时进入 inline ascii 模式
