@@ -37,7 +37,7 @@
 ;; Prevent unwanted runtime compilation for gccemacs (native-comp) users;
 ;; packages are compiled ahead-of-time when they are installed and site files
 ;; are compiled when gccemacs is installed.
-(setq native-comp-deferred-compilation nil ;; obsolete since 29.1
+(setq native-comp-deferred-compilation nil ;; obsolete since 29.1 
       native-comp-jit-compilation nil)
 
 ;; Package initialize occurs automatically, before `user-init-file' is
@@ -67,6 +67,7 @@
 (setq-default mode-line-format nil)
 
 ;; Bootstrap straight.el
+(setq comp-deferred-compilation-deny-list nil)
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -80,7 +81,10 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+;; Disable any code that relates to package.el
+;; see https://github.com/radian-software/straight.el#getting-started
 (setq package-enable-at-startup nil)
+
 ;; integrate straight.el with use-package
 (straight-use-package 'use-package)
 
