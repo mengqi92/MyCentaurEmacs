@@ -60,7 +60,12 @@
 (use-package rime
   :custom
   (default-input-method "rime")
+  :bind
+  (:map rime-mode-map
+   ("C-`" . 'rime-send-keybinding)
+   ("C-S-`" . 'rime-send-keybinding))
   :config
+  (setq rime-emacs-module-header-root "/opt/homebrew/Cellar/emacs/include")
   (setq rime-user-data-dir "~/emacs-rime/")
   (setq rime-share-data-dir "/usr/share/rime-data")
   (when on-macbook (setq rime-librime-root "~/.emacs.d/librime/dist"))
