@@ -7,7 +7,7 @@
 
 ;;; Code:
 
-(setq evil-want-keybinding nil)
+; (setq evil-want-keybinding nil)
 (use-package evil
   :config
   (evil-mode 1))
